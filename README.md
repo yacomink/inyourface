@@ -1,6 +1,6 @@
 ## In Your Face
 
-A handful of low-rent animations layerd atop all the faces in your image.
+A handful of low-rent animations layerd atop all the faces in your image. Uses Google Vision API for face/feature detection, and gifsicle for makin' gifs.
 
 ### Usage
 
