@@ -23,7 +23,7 @@ Options:
 ![](https://github.com/yacomink/inyourface/blob/master/examples/63d1c91a84f90cbf3978a7c9936cc966876ab1a0.gif?raw=true)
 #### Crying
 ![](https://github.com/yacomink/inyourface/blob/master/examples/dfa3376f7075094f951cfb808eb530bffde9f930.gif?raw=true)
-#### CryingBlood
+#### Cryingblood
 ![](https://github.com/yacomink/inyourface/blob/master/examples/c050d3929b14252276557d4d72ca395bf92f597d.gif?raw=true)
 #### Googly
 ![](https://github.com/yacomink/inyourface/blob/master/examples/0500b8896bee27f4db798a1c1d9a0e1d1d9a0784.gif?raw=true)
@@ -34,7 +34,7 @@ Options:
 
 ### Effect Combinations
 
-#### Angry + Googly + CryingBlood
+#### Angry + Googly + Cryingblood
 ![](https://github.com/yacomink/inyourface/blob/master/examples/2fecff2f9f51066c704fdeb16298873825f29579.gif?raw=true)
 
 #### Googly + Thinking on a gif
