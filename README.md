@@ -1,6 +1,6 @@
 ## In Your Face
 
-A handful of low-rent animations layerd atop all the faces in your image.
+A handful of low-rent animations layerd atop all the faces in your image. Uses Google Vision API for face/feature detection, and gifsicle for makin' gifs.
 
 ### Usage
 
@@ -42,4 +42,6 @@ Options:
 
 ### Requirements
 
-`gifsicle` https://www.lcdf.org/gifsicle/
+1. `gifsicle` https://www.lcdf.org/gifsicle/
+
+2. An account setup with the Google Vision API, and your credentials file `google-credentials.json` file somewhere that `run.py` can get to it.
