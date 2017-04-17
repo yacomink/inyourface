@@ -17,7 +17,7 @@ import click
 # TODO: implement --list
 #@click.option('--list', help='List available effects')
 
-def run(url, effect, google_credentials, image_directory, list):
+def run(url, effect, google_credentials, image_directory):
     os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = google_credentials
     if (len(effect) == 0):
         print "You must specify some effects!"
