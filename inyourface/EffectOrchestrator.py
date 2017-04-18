@@ -27,8 +27,11 @@ class EffectOrchestrator(Animator):
         self.effects = effects
         self.effect_processors = []
         for e in effects:
-            effect_module = getattr(inyourface.effect, e[0].upper() + e[1:])
-            self.effect_processors.append(effect_module.EffectAnimator(url, destdir))
+            try:
+                effect_module = getattr(inyourface.effect, e[0].upper() + e[1:])
+                self.effect_processors.append(effect_module.EffectAnimator(url, destdir))
+            except Exception as ex:
+                print "No such " + e
 
 
         hasher = hashlib.sha1()
