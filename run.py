@@ -23,7 +23,7 @@ def run(url, effect, google_credentials, image_directory):
         print "You must specify some effects!"
         exit()
     elif (len(effect) == 1):
-        effect_module = getattr(inyourface.effect, effect[0])
+        effect_module = getattr(inyourface.effect, effect[0][0].upper() + effect[0][1:])
         gif = effect_module.EffectAnimator(url, image_directory)
         print gif.gif()
     else:
