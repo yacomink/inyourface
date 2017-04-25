@@ -19,6 +19,9 @@ import click
 
 def run(url, effect, google_credentials, image_directory):
     os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = google_credentials
+
+    effect = list(filter((lambda x: is_effect(x)), effect))
+
     if (len(effect) == 0):
         print "You must specify some effects!"
         exit()
@@ -29,6 +32,14 @@ def run(url, effect, google_credentials, image_directory):
     else:
         gif = EffectOrchestrator(url, image_directory, effect)
         print gif.gif()
+
+def is_effect(e):
+    try:
+        effect_module = getattr(inyourface.effect, e[0].upper() + e[1:])
+        return True
+    except Exception as ex:
+        return False
+
 
 if __name__ == '__main__':
     run()

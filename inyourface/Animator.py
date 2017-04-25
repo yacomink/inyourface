@@ -26,6 +26,7 @@ class Animator(object):
         self.vision_client = vision.Client()
         self.url = url
         self.destdir = destdir
+        self.raw_frames = []
 
         hasher = hashlib.sha1()
         hasher.update(self.__class__.name)
@@ -56,6 +57,7 @@ class Animator(object):
             faces = self.transform_faces(image.detect_faces())
 
             frame_image = self.manipulate_frame( frame_image, faces, nframes )
+            self.raw_frames.append(frame_image)
 
             frames[-1] = NamedTemporaryFile(suffix='.gif')
             frame_image.save(frames[-1])
@@ -73,6 +75,7 @@ class Animator(object):
             faces = self.transform_faces(image.detect_faces())
 
             out = self.manipulate_frame( self.image.copy(), faces, i )
+            self.raw_frames.append(out)
 
             frames.append(NamedTemporaryFile(suffix='.gif'))
             out.save(frames[-1])
@@ -96,6 +99,11 @@ class Animator(object):
             self.total_frames = len(self.__class__.frames)
             frames = self.generate_frames_from_image()
             cmd = "/usr/bin/gifsicle --delay=" + str(self.__class__.delay) + " -l0 --colors 255"
+
+        if (self.total_frames == 1 and not self.animated_source):
+            outname = self.destdir + self.__class__.name + "/" + self.hash + ".jpg"
+            self.raw_frames[-1].save(outname)
+            return outname
 
         for (file) in frames:
             cmd += " " + file.name
