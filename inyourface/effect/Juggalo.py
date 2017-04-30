@@ -60,7 +60,10 @@ class EffectAnimator(Animator):
            [323, 327],
            [325, 385],
            [233, 337],
-           [416, 334]])
+           [416, 334],
+           [222, 281],
+           [425, 277]
+           ])
 
     def getMouthPoints(self, face):
         points = []
@@ -72,7 +75,10 @@ class EffectAnimator(Animator):
                         'mouth_center',
                         'chin_gnathion',
                         'chin_left_gonion',
-                        'chin_right_gonion'):
+                        'chin_right_gonion',
+                        'left_ear_tragion',
+                        'right_ear_tragion'
+                        ):
             points.append( face.get_landmark_coords(feature) )
 
         return points
