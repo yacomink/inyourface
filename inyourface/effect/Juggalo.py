@@ -13,11 +13,11 @@ class EffectAnimator(Animator):
 
     frames = [0]
 
-    name = "clown"
+    name = "juggalo"
 
     mask_path = os.path.dirname(os.path.realpath(__file__)) + "/../../overlays/mask.png"
-    mask_elements_path = os.path.dirname(os.path.realpath(__file__)) + "/../../overlays/mask-elements.png"
-    mask_mouth_path = os.path.dirname(os.path.realpath(__file__)) + "/../../overlays/mask-mouth.png"
+    mask_elements_path = os.path.dirname(os.path.realpath(__file__)) + "/../../overlays/juggalo-elements.png"
+    mask_mouth_path = os.path.dirname(os.path.realpath(__file__)) + "/../../overlays/juggalo-mouth.png"
 
     average_points = np.array([[245, 215],
            [301, 212],
