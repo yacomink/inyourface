@@ -13,11 +13,12 @@ import click
 
 @click.option('--google_credentials', default='./google-credentials.json', help='Location of google API credentials json file.')
 @click.option('--image_directory', default='./', help='Where to put finished images.')
+@click.option('--cache_dir', default=False, help='Directory in which to place a cache of face detection results')
 
 # TODO: implement --list
 #@click.option('--list', help='List available effects')
 
-def run(url, effect, google_credentials, image_directory):
+def run(url, effect, google_credentials, image_directory, cache_dir):
     os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = google_credentials
 
     effect = list(filter((lambda x: is_effect(x)), effect))
@@ -27,10 +28,10 @@ def run(url, effect, google_credentials, image_directory):
         exit()
     elif (len(effect) == 1):
         effect_module = getattr(inyourface.effect, effect[0][0].upper() + effect[0][1:])
-        gif = effect_module.EffectAnimator(url, image_directory)
+        gif = effect_module.EffectAnimator(url, image_directory, cache_dir)
         print gif.gif()
     else:
-        gif = EffectOrchestrator(url, image_directory, effect)
+        gif = EffectOrchestrator(url, image_directory, cache_dir, effect)
         print gif.gif()
 
 def is_effect(e):

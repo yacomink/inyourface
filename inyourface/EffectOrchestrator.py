@@ -22,14 +22,14 @@ class EffectOrchestrator(Animator):
     name = "multi"
     delay = 24
 
-    def __init__(self, url, destdir, effects):
-        Animator.__init__(self, url, destdir)
+    def __init__(self, url, destdir, cache_dir, effects):
+        Animator.__init__(self, url, destdir, cache_dir)
         self.effects = effects
         self.effect_processors = []
         for e in effects:
             try:
                 effect_module = getattr(inyourface.effect, e[0].upper() + e[1:])
-                self.effect_processors.append(effect_module.EffectAnimator(url, destdir))
+                self.effect_processors.append(effect_module.EffectAnimator(url, destdir, cache_dir))
             except Exception as ex:
                 print "No such " + e
 
@@ -40,6 +40,7 @@ class EffectOrchestrator(Animator):
         hasher.update(url)
 
         self.hash = hasher.hexdigest()
+
 
     def manipulate_frame(self, frame_image, faces, index):
         for effect_processor in self.effect_processors:
