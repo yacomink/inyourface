@@ -128,8 +128,8 @@ class EffectAnimator(Animator):
 
     def maskFace(self, frame_image, face):
 
-        img1 = cv2.imread(self.mask_path, cv2.IMREAD_UNCHANGED);
-        elements = cv2.imread(self.mask_elements_path, cv2.IMREAD_UNCHANGED);
+        img1 = cv2.imread(self.__class__.mask_path, cv2.IMREAD_UNCHANGED);
+        elements = cv2.imread(self.__class__.mask_elements_path, cv2.IMREAD_UNCHANGED);
               
         h, status = cv2.findHomography(self.average_points, np.array(self.getFacePoints(face)))
         mask = self.getTransPIL(cv2.warpPerspective(img1, h, (frame_image.width,frame_image.height)))
@@ -146,7 +146,7 @@ class EffectAnimator(Animator):
         frame_image.paste(mask_elements, (0,0), mask_elements)
 
     def maskMouth(self, frame_image, face):
-        elements = cv2.imread(self.mask_mouth_path, cv2.IMREAD_UNCHANGED);
+        elements = cv2.imread(self.__class__.mask_mouth_path, cv2.IMREAD_UNCHANGED);
               
         h, status = cv2.findHomography(self.average_mouth_points, np.array(self.getMouthPoints(face)))
         mask_elements = self.getTransPIL(cv2.warpPerspective(elements, h, (frame_image.width,frame_image.height)))
