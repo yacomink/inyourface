@@ -8,7 +8,7 @@ from inyourface import EffectOrchestrator
 
 import click
 @click.command()
-@click.option('--url', required=True, help='Url of the input image to be manipulated')
+@click.option('--url', required=True, multiple=True, help='Url of the input image to be manipulated')
 @click.option('--effect', '-e', required=True, multiple=True, help='The effect to apply, can specify multiple with -e effect1 -e effect2')
 
 @click.option('--google_credentials', default='./google-credentials.json', help='Location of google API credentials json file.')

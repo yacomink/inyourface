@@ -1,16 +1,9 @@
-import random
-import cv2
-from PIL import Image,ImageDraw,ImageEnhance
-from tempfile import NamedTemporaryFile
-import math
-import numpy as np
-from pprint import pprint
 import os 
-
-from inyourface.Animator import Animator
 from inyourface.effect import Juggalo
 
 class EffectAnimator(Juggalo.EffectAnimator):
+
+    frames = [0]
 
     name = "clown"
 

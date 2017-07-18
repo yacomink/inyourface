@@ -26,15 +26,20 @@ class Animator(object):
 
     def __init__(self, url, destdir, cache_dir):
         self.vision_client = vision.Client()
-        self.url = url
+        self.url = url[-1]
+        if len(url) > 1:
+            self.secondary_urls = list(url[0:-1])
+        else:
+            self.secondary_urls = []
         self.destdir = destdir
         self.cache_dir = cache_dir
         self.cache_connection = False
         self.raw_frames = []
+        self.total_frames = len(self.__class__.frames)
 
         hasher = hashlib.sha1()
         hasher.update(self.__class__.name)
-        hasher.update(url)
+        hasher.update(','.join(url))
 
         if (self.cache_dir):
             if not os.path.exists(self.cache_dir):
@@ -113,7 +118,7 @@ class Animator(object):
 
         frames = []
         durations = []
-        for (i) in self.__class__.frames:
+        for (i) in range(0, self.total_frames) if self.total_frames > 1 else [0]:
         
             faces = self.transform_faces(self.get_faces(self.imdata))
 
@@ -134,6 +139,14 @@ class Animator(object):
             outname = self.destdir + self.__class__.name + "/" + self.hash + ".gif"
             self.imdata = urllib.urlopen(self.url).read()
             self.image = Image.open(cStringIO.StringIO(self.imdata))
+            if (len(self.secondary_urls) > 0):
+                self.secondary_imdata = []
+                self.secondary_image = []
+                for url in self.secondary_urls:
+                    imdata = urllib.urlopen(url).read();
+                    self.secondary_imdata.append(imdata)
+                    self.secondary_image.append(Image.open(cStringIO.StringIO(imdata)))
+
             self.animated_source = self.check_animated(self.image)
 
             durations = [self.__class__.delay]
@@ -142,7 +155,6 @@ class Animator(object):
                 (frames, durations) = self.generate_frames_from_animation()
                 cmd = "/usr/bin/gifsicle -l0 --colors 255"
             else:
-                self.total_frames = len(self.__class__.frames)
                 (frames, durations) = self.generate_frames_from_image()
                 cmd = "/usr/bin/gifsicle --delay=" + str(self.__class__.delay) + " -l0 --colors 255"
 

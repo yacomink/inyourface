@@ -6,3 +6,5 @@ from inyourface.effect.Cryingblood import EffectAnimator
 from inyourface.effect.Clown import EffectAnimator
 from inyourface.effect.Juggalo import EffectAnimator
 from inyourface.effect.Ham import EffectAnimator
+from inyourface.effect.Swap import EffectAnimator
+from inyourface.effect.ShuffleFaces import EffectAnimator
