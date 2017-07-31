@@ -14,8 +14,7 @@ class EffectAnimator(Animator):
 
     name = "swap"
     source_url = ""
-    converted_source = []
-    source_faces = None
+    source_faces = []
     frames = [0]
 
     def manipulate_frame(self, frame_image, faces, index):
@@ -24,13 +23,21 @@ class EffectAnimator(Animator):
         dest_faces = faces
         mask = np.zeros(dest.shape, dtype = dest.dtype)
 
-        if len(self.converted_source) == 0:
-            self.converted_source = np.array(self.secondary_image[0].convert('RGB'));
-            self.source_faces = self.get_faces(self.secondary_imdata[0])
+        if len(self.source_faces) == 0:
+            for source in self.secondary_image:
+                output = io.BytesIO()
+                source.save(output, format="JPEG")
+                secondary_faces = self.get_faces(output.getvalue())
+                output.close()
+                converted_source = np.array(source.convert('RGB'));
+                for face in secondary_faces:
+                    self.source_faces.append( (face, converted_source) )
+
 
         j = 0
         for dest_face in dest_faces:
-            (dest, mask) = self.pasteOne(self.converted_source, dest, self.source_faces[ j % len(self.source_faces) ], dest_face, mask)
+            (source_face, source_image) = self.source_faces[j % len(self.source_faces)]
+            (dest, mask) = self.pasteOne(source_image, dest, source_face, dest_face, mask)
             j = j + 1
 
         frame_image.paste(Image.fromarray(dest), mask=Image.fromarray(mask).convert('L').filter(ImageFilter.GaussianBlur(4)))
