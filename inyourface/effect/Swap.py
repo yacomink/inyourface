@@ -37,7 +37,10 @@ class EffectAnimator(Animator):
         j = 0
         for dest_face in dest_faces:
             (source_face, source_image) = self.source_faces[j % len(self.source_faces)]
-            (dest, mask) = self.pasteOne(source_image, dest, source_face, dest_face, mask)
+            try:
+                (dest, mask) = self.pasteOne(source_image, dest, source_face, dest_face, mask)
+            except Exception as e:
+                pass
             j = j + 1
 
         frame_image.paste(Image.fromarray(dest), mask=Image.fromarray(mask).convert('L').filter(ImageFilter.GaussianBlur(4)))
