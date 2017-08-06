@@ -139,9 +139,9 @@ class Animator(object):
             outname = self.destdir + self.__class__.name + "/" + self.hash + ".gif"
             self.imdata = urllib.urlopen(self.url).read()
             self.image = Image.open(cStringIO.StringIO(self.imdata))
+            self.secondary_imdata = []
+            self.secondary_image = []
             if (len(self.secondary_urls) > 0):
-                self.secondary_imdata = []
-                self.secondary_image = []
                 for url in self.secondary_urls:
                     imdata = urllib.urlopen(url).read();
                     self.secondary_imdata.append(imdata)
@@ -153,10 +153,10 @@ class Animator(object):
             if (self.animated_source):
                 self.total_frames = self.animated_source
                 (frames, durations) = self.generate_frames_from_animation()
-                cmd = "/usr/bin/gifsicle -l0 --colors 255"
+                cmd = "gifsicle -l0 --colors 255"
             else:
                 (frames, durations) = self.generate_frames_from_image()
-                cmd = "/usr/bin/gifsicle --delay=" + str(self.__class__.delay) + " -l0 --colors 255"
+                cmd = "gifsicle --delay=" + str(self.__class__.delay) + " -l0 --colors 255"
 
             if (self.total_frames == 1 and not self.animated_source):
                 outname = self.destdir + self.__class__.name + "/" + self.hash + ".jpg"
