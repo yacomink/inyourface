@@ -10,3 +10,4 @@ from inyourface.effect.Swap import EffectAnimator
 from inyourface.effect.ShuffleFaces import EffectAnimator
 from inyourface.effect.Gray import EffectAnimator
 from inyourface.effect.Lasers import EffectAnimator
+from inyourface.effect.Glitter import EffectAnimator
