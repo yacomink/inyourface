@@ -39,7 +39,7 @@ class EffectAnimator(Animator):
             x = lx + abs((rx-lx)/2.0) - abs(gsx/2.0)
 
             rot = self.__class__.angle(lx, ly, rx, ry)
-            pasted = glasses.rotate(rot, Image.BICUBIC)
+            pasted = glasses.rotate(rot, expand=True)
             frame_image.paste(pasted, (int(x), int(height)), pasted)
 
         return frame_image
