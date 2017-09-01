@@ -3,7 +3,6 @@ import urllib
 import cStringIO
 import hashlib, pprint
 import os
-import simplejson as json
 from subprocess import call
 import random
 from PIL import Image, ImageDraw

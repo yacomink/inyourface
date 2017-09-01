@@ -1,9 +1,9 @@
 import sys
 import urllib
+import logging
 import cStringIO
 import hashlib, pprint
 import os
-import simplejson as json
 from subprocess import call
 import random
 from PIL import Image, ImageDraw
@@ -105,7 +105,11 @@ class Animator(object):
 
             faces = self.transform_faces(self.get_faces(content))
 
-            frame_image = self.manipulate_frame( frame_image, faces, nframes )
+            try:
+                frame_image = self.manipulate_frame( frame_image, faces, nframes )
+            except:
+                logging.exception("Something awful happened!")
+
             self.raw_frames.append(frame_image)
 
             frames[-1] = NamedTemporaryFile(suffix='.gif')
@@ -122,7 +126,11 @@ class Animator(object):
         
             faces = self.transform_faces(self.get_faces(self.imdata))
 
-            out = self.manipulate_frame( self.image.copy(), faces, i )
+            try:
+                out = self.manipulate_frame( self.image.copy(), faces, i )
+            except:
+                logging.exception("Something awful happened!")
+    
             self.raw_frames.append(out)
 
             frames.append(NamedTemporaryFile(suffix='.gif'))

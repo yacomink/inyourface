@@ -4,7 +4,6 @@ import urllib
 import cStringIO
 import hashlib, pprint
 import tempfile, os
-import simplejson as json
 from subprocess import call
 import os
 import random
