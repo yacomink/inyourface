@@ -12,3 +12,4 @@ from inyourface.effect.Gray import EffectAnimator
 from inyourface.effect.Lasers import EffectAnimator
 from inyourface.effect.Glitter import EffectAnimator
 from inyourface.effect.FlavorEnhance import EffectAnimator
+from inyourface.effect.Deal import EffectAnimator
