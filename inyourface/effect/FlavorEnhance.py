@@ -8,75 +8,47 @@ from inyourface.Animator import Animator
 
 class EffectAnimator(Animator):
 
-    name = "crying"
+    name = "multi"
     frames = range(0,5)
-    delay = 200
+    delay = 150
     random_face = None
+    ex = 0
+    ey = 0
+    initial_size = 0.02
+    scale_factor = 1.5
 
     def manipulate_frame(self, frame_image, faces, index):
         fieri = Image.open('overlays/fieri.png')
 
+        original_size = frame_image.size
         if (index == 0):
-            self.random_face = random.choice(faces)
-        ((lcx, lcy), (ex, ey), (rcx, rcy)) = self.random_face.get_eye_coords('left')
+            self.ex = int(((random.random() * 0.6) + 0.2) * frame_image.size[0])
+            self.ey = int(((random.random() * 0.6) + 0.2) * frame_image.size[1])
+            self.fieri_width = frame_image.size[0] * self.initial_size
+        else:
+            scale = self.scale_factor * index
+            self.fieri_width = frame_image.size[0] * self.initial_size * scale
+            frame_image = frame_image.resize((int(original_size[0]*scale), int(original_size[1]*scale)), Image.BICUBIC)
+            ( rex, rey ) = ( self.ex*scale, self.ey*scale )
+            crop_coords = (
+                int(rex - original_size[0]/2),
+                int(rey - original_size[1]/2),
+                int(rex + original_size[0]/2),
+                int(rey + original_size[1]/2)
+            );
+            frame_image = frame_image.crop( crop_coords ).copy()
 
-        fieri_width = (rcx - lcx) * 1.15
-
-        scale = 1 - (float(index)/float(self.total_frames))
-
-        img = frame_image
-        idk = 1
-        offsets = (0,0)
-        if (index > 0):
-            (idk, offsets, img) = self.crop_image(frame_image, (ex, ey), scale)
-
-        re_width = max(int(fieri_width * idk), 1)
-        re_height = max(int(fieri_width * 1.2 * idk), 1)
-
+        re_width = max(int(self.fieri_width ), 1)
+        re_height = max(int(self.fieri_width * 1.2), 1)
         fieri = fieri.resize((re_width, re_height), Image.BICUBIC)
 
-        base = img.copy()
+        base = frame_image.copy()
 
         if (index > 0):
-            img.paste(fieri, ( int(frame_image.size[0]/2 - fieri.size[0]/2 + offsets[0]), int(frame_image.size[1]/2- fieri.size[1]/2 + offsets[1]) ), fieri)
+            frame_image.paste(fieri, ( int(frame_image.size[0]/2 - re_width/2), int(frame_image.size[1]/2- re_height/2) ), fieri)
         else:
-            img.paste(fieri, ( int(ex - fieri.size[0]/2 + offsets[0]), int(ey - fieri.size[1]/2 + offsets[1]) ), fieri)
+            frame_image.paste(fieri, ( int(self.ex - re_width/2), int(self.ey - re_height/2) ), fieri)
 
-        alpha = 1 - ((index+2) * 0.2)
-        pprint.pprint((scale, alpha))
-        return Image.blend(img, base, max(scale - 0.3, 0))
+        return Image.blend(base, frame_image, float(index+1) / float(self.total_frames))
 
 
-    def crop_image(self, img, xy, scale_factor):
-        '''Crop the image around the tuple xy
-
-        Inputs:
-        -------
-        img: Image opened with PIL.Image
-        xy: tuple with relative (x,y) position of the center of the cropped image
-            x and y shall be between 0 and 1
-        scale_factor: the ratio between the original image's size and the cropped image's size
-        '''
-        center = xy
-        original_size = img.size
-        offset_x = 0
-        offset_y = 0
-
-        size_down = scale_factor
-        left = (int) (xy[0] - ((img.size[0] * size_down) / 2))
-        right = (int) (xy[0] + ((img.size[0] * size_down) / 2))
-        upper = (int) (xy[1] - ((img.size[1] * size_down) / 2))
-        lower = (int) (xy[1] + ((img.size[1] * size_down) / 2))
-        cropped_img = img.crop((left, upper, right, lower)).copy()
-        # if (upper < 0):
-        #     offset_y = upper * -1
-        #     lower += offset_y
-        #     upper = 0
-        # if (left < 0):
-        #     offset_x = left * -1
-        #     right += offset_x
-        #     left = 0
-        # pprint.pprint((left, upper, right, lower, size_down))
-        crop_scale_up = float(original_size[0]) / float(cropped_img.size[0])
-
-        return (crop_scale_up, (offset_x, offset_y), cropped_img.resize(original_size, Image.BICUBIC))
