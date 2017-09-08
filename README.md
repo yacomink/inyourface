@@ -17,6 +17,20 @@ Options:
   --help                     Show this message and exit.
 ```
 
+### Running as a service
+
+#### On google app engine
+
+```
+gcloud app deploy
+```
+
+#### Locally
+
+```
+FLASK_DEBUG=1 FLASK_APP=server.py GOOGLE_APPLICATION_CREDENTIALS=./google-credentials.json python -m flask run
+```
+
 ### Effects
 
 #### Angry
