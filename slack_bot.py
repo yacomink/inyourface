@@ -20,8 +20,11 @@ def activate_job():
 
     global project_id, publisher, subscriber, topic_path, subscription_path, bucket_name, slack_api_token
 
-    with io.open(os.environ.get('GOOGLE_APPLICATION_CREDENTIALS'), 'r', encoding='utf-8') as json_fi:
-            project_id = json.load(json_fi).get('project_id')
+    if (os.getenv('APPLICATION_ID')):
+        project_id = os.getenv('APPLICATION_ID')
+    else:
+        with io.open(os.environ.get('GOOGLE_APPLICATION_CREDENTIALS'), 'r', encoding='utf-8') as json_fi:
+                project_id = json.load(json_fi).get('project_id')
 
     # Topics and Subscriptions
     publisher = pubsub_v1.PublisherClient()
