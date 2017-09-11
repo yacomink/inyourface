@@ -10,7 +10,7 @@ class EffectAnimator(Animator):
 
     name = "multi"
     frames = range(0,6)
-    delay = 160
+    delay = 200
     random_face = None
     ex = 0
     ey = 0

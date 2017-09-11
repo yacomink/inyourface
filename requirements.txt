@@ -3,6 +3,10 @@ opencv_python==3.2.0.6
 numpy==1.12.0
 Pillow==4.1.0
 google-cloud-vision
+google-cloud-storage
+google-cloud-pubsub
+google-api-python-client
+slackclient
 oauth2client
 sympy
 flask

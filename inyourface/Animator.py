@@ -144,7 +144,10 @@ class Animator(object):
 
     def gif(self):
         try:
-            outname = self.destdir + self.__class__.name + "/" + self.hash + ".gif"
+            if (self.destdir):
+                outname = self.destdir + self.__class__.name + "/" + self.hash + ".gif"
+            else:
+                outname = NamedTemporaryFile(suffix='.{}.gif'.format(self.hash)).name
             self.imdata = urllib.urlopen(self.url).read()
             self.image = Image.open(cStringIO.StringIO(self.imdata))
             self.secondary_imdata = []
@@ -167,7 +170,10 @@ class Animator(object):
                 cmd = "gifsicle --delay=" + str(self.__class__.delay) + " -l0 --colors 255"
 
             if (self.total_frames == 1 and not self.animated_source):
-                outname = self.destdir + self.__class__.name + "/" + self.hash + ".jpg"
+                if (self.destdir):
+                    outname = self.destdir + self.__class__.name + "/" + self.hash + ".jpg"
+                else:
+                    outname = NamedTemporaryFile(suffix='.{}.jpg'.format(self.hash)).name
                 self.raw_frames[-1].save(outname)
                 return outname
             else:
@@ -175,6 +181,7 @@ class Animator(object):
                     cmd += ' -d' + str(durations[x]) + ' ' + frames[x].name
 
             cmd += " > " + outname
+            print cmd
 
             call(cmd, shell=True)
             if (self.cache_connection):

@@ -21,4 +21,4 @@ RUN pip install -r /app/requirements.txt
 # Add the application source code.
 ADD . /app
 
-CMD gunicorn -b :$PORT server:app
+CMD gunicorn -b :$PORT slack_bot:app
