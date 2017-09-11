@@ -22,6 +22,10 @@ def activate_job():
 
     if (os.getenv('APPLICATION_ID')):
         project_id = os.getenv('APPLICATION_ID')
+    elif (os.getenv('GCLOUD_PROJECT')):
+        project_id = os.getenv('GCLOUD_PROJECT')
+    elif (os.getenv('GOOLE_CLOUD_PROJECT')):
+        project_id = os.getenv('GOOLE_CLOUD_PROJECT')
     else:
         with io.open(os.environ.get('GOOGLE_APPLICATION_CREDENTIALS'), 'r', encoding='utf-8') as json_fi:
                 project_id = json.load(json_fi).get('project_id')
