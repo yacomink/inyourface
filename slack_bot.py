@@ -131,6 +131,7 @@ def parse_slack_message(text):
     tokens = re.split(r" +", text)
     effects = []
     urls = []
+    slack_client = SlackClient(slack_api_token)
     for token in tokens:
         if (re.match(r"\+[A-Za-z]+", token)):
             effect_name = token.replace('+','')
