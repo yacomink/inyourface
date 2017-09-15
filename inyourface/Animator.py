@@ -17,7 +17,7 @@ import os
 
 from inyourface.Face import Face
 from google.cloud import vision
-from inyourface.DefaultCacheProvider import CacheProvider
+import inyourface.DefaultCacheProvider
 
 class Animator(object):
     
@@ -43,12 +43,15 @@ class Animator(object):
         hasher.update(','.join(url))
 
         if (self.cache_dir):
-            self.cache_provider = CacheProvider(self.cache_dir)
+            self.cache_provider = inyourface.DefaultCacheProvider.CacheProvider(self.cache_dir)
 
         self.hash = hasher.hexdigest()
 
     def manipulate_frame(self, frame_image, faces, index):
         raise NotImplementedError( "Should have implemented this" )
+
+    def set_cache_provider(self, provider):
+        self.cache_provider = provider
 
     def get_faces(self, image_data):
 
@@ -58,7 +61,7 @@ class Animator(object):
         if (self.cache_provider):
             res = self.cache_provider.get(cache_key)
             if (res):
-                return pickle.loads(res[1])
+                return pickle.loads(res)
 
         image = self.vision_client.image(content=image_data)
         faces = image.detect_faces()

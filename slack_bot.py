@@ -9,6 +9,7 @@ import pprint
 import httplib2
 import urllib2
 from inyourface import EffectOrchestrator
+from inyourface.GStorageCacheProvider import CacheProvider
 import inyourface.effect
 import logging
 import urllib
@@ -85,12 +86,14 @@ def activate_job():
 
 
 def sub_worker(message):
+    global project_id
     response_url = message.attributes.get('response_url')
     effects = message.attributes.get('effects').split(' ')
     urls = message.attributes.get('urls').split(' ')
     text = message.data
 
     gif = EffectOrchestrator(urls, False, False, effects)
+    gif.set_cache_provider(CacheProvider(project_id))
     file_path = gif.gif()
     client = storage.Client()
     bucket = client.get_bucket(bucket_name)
