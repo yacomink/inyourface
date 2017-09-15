@@ -4,7 +4,7 @@ from google.gax.errors import RetryError
 from slackclient import SlackClient
 from flask import Flask, request, jsonify
 from google.cloud import pubsub_v1
-import json, re, io
+import json, re, io, os
 import pprint
 import httplib2
 import urllib2
@@ -26,9 +26,12 @@ def activate_job():
         project_id = os.getenv('GCLOUD_PROJECT')
     elif (os.getenv('GOOLE_CLOUD_PROJECT')):
         project_id = os.getenv('GOOLE_CLOUD_PROJECT')
-    else:
+    elif (os.environ.get('GOOGLE_APPLICATION_CREDENTIALS')):
         with io.open(os.environ.get('GOOGLE_APPLICATION_CREDENTIALS'), 'r', encoding='utf-8') as json_fi:
                 project_id = json.load(json_fi).get('project_id')
+
+    if (not project_id):
+        return False;
 
     # Topics and Subscriptions
     publisher = pubsub_v1.PublisherClient()
@@ -59,17 +62,20 @@ def activate_job():
         print "Topic exists"
 
     # TODO: This is a Real Dumb Idea. This flask app should not also be acting
-    # as a pub/sub worker. I should split this up and use GAE Task Queues.
+    # as a pub/sub worker. This should probably use GAE Task Queues, but again,
+    # the GAE dev env is basically broken with flexible environment.
     try:
         subscriber.create_subscription(subscription_path, topic_path)
     except (RetryError) as e:
-        # IGNORE: This is not, per the docs, supposed to raise an error,
+        # IGNORE: This is not, per the docs, supposed to raise an error.
         print "Subscription exists"
 
     def protected_worker(message):
         try:
             message.ack()
-            sub_worker(message)
+            if (not message_locked(message)):
+                lock_message(message)
+                sub_worker(message)
         except Exception as e:
             logging.exception("Exception on queue worker")
 
@@ -102,6 +108,17 @@ def sub_worker(message):
             "text": blob.public_url
         }))
 
+def lock_message(message):
+    client = storage.Client()
+    bucket = client.get_bucket(bucket_name)
+    blob = bucket.blob('lock/' + message.message_id)
+    blob.upload_from_string('LOCK')
+
+def message_locked(message):
+    client = storage.Client()
+    bucket = client.get_bucket(bucket_name)
+    blob = bucket.blob('lock/' + message.message_id)
+    return blob.exists()
 
 
 
