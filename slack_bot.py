@@ -11,6 +11,7 @@ import urllib2
 from inyourface import EffectOrchestrator
 import inyourface.effect
 import logging
+import urllib
 
 import os
 app = Flask(__name__)
@@ -154,6 +155,10 @@ def parse_slack_message(text):
             effect_name = token.replace('+','')
             if (is_effect(effect_name)):
                 effects.append(effect_name)
+        elif (re.match(r"https://slack-imgs.com/\?c=1&url=", token)):
+            url = token.replace("https://slack-imgs.com/?c=1&url=",'')
+            url = urllib.unquote(url)
+            urls.append(url)
         elif (re.match(r"https?://", token)):
             urls.append(token)
         elif (re.match(r"<@U.*\|*>", token)):

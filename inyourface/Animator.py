@@ -17,6 +17,7 @@ import os
 
 from inyourface.Face import Face
 from google.cloud import vision
+from inyourface.DefaultCacheProvider import CacheProvider
 
 class Animator(object):
     
@@ -33,7 +34,7 @@ class Animator(object):
             self.secondary_urls = []
         self.destdir = destdir
         self.cache_dir = cache_dir
-        self.cache_connection = False
+        self.cache_provider = False
         self.raw_frames = []
         self.total_frames = len(self.__class__.frames)
 
@@ -42,16 +43,7 @@ class Animator(object):
         hasher.update(','.join(url))
 
         if (self.cache_dir):
-            if not os.path.exists(self.cache_dir):
-                os.makedirs(self.cache_dir)
-            conn = sqlite3.connect(self.cache_dir + 'faces.db')
-            self.cache_connection = conn
-            c = conn.cursor()
-
-            # Create table
-            c.execute('''CREATE TABLE IF NOT EXISTS faces
-                         (facesum char(32) PRIMARY KEY, face_data text)''')
-            self.cache_connection.commit()
+            self.cache_provider = CacheProvider(self.cache_dir)
 
         self.hash = hasher.hexdigest()
 
@@ -63,21 +55,16 @@ class Animator(object):
         hasher = hashlib.md5()
         hasher.update(image_data)
         cache_key = hasher.hexdigest()
-        if (self.cache_connection):
-            c = self.cache_connection.cursor()
-            c.execute("select * FROM faces WHERE facesum = ?", (cache_key,))
-            res = c.fetchone()
+        if (self.cache_provider):
+            res = self.cache_provider.get(cache_key)
             if (res):
                 return pickle.loads(res[1])
-
 
         image = self.vision_client.image(content=image_data)
         faces = image.detect_faces()
 
-        if (self.cache_connection):
-            c = self.cache_connection.cursor()
-            c.execute('REPLACE INTO faces (facesum, face_data) VALUES (?,?)', (cache_key, pickle.dumps(faces)))
-            self.cache_connection.commit()
+        if (self.cache_provider):
+            self.cache_provider.set(cache_key, pickle.dumps(faces))
 
         return faces
 
@@ -181,16 +168,15 @@ class Animator(object):
                     cmd += ' -d' + str(durations[x]) + ' ' + frames[x].name
 
             cmd += " > " + outname
-            print cmd
 
             call(cmd, shell=True)
-            if (self.cache_connection):
-                self.cache_connection.close()
+            if (self.cache_provider):
+                self.cache_provider.close()
             return outname
         except Exception as e:
             pprint.pprint(e)
-            if (self.cache_connection):
-                self.cache_connection.close()
+            if (self.cache_provider):
+                self.cache_provider.close()
 
     def check_animated(self, img):
         try:
