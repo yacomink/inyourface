@@ -159,8 +159,11 @@ def parse_slack_message(text):
         elif (re.match(r"<@U.*\|*>", token)):
             # Get user profile image
             user_lookup = slack_client.api_call('users.info', user=re.match(r"<@(U.*)\|.*>", token).group(1))
-            if (user_lookup['ok'] and user_lookup["user"]["profile"]["image_original"]):
-                urls.append(user_lookup["user"]["profile"]["image_original"])
+            if (user_lookup['ok']):
+                for key in ("image_original","image_1024","image_512","image_192"):
+                    if (key in user_lookup["user"]["profile"]):
+                        urls.append(user_lookup["user"]["profile"][key])
+                        break
     return (tokens, effects, urls)
 
 def is_effect(e):
