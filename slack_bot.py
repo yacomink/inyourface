@@ -3,16 +3,18 @@ from google.cloud import storage
 from google.gax.errors import RetryError
 from slackclient import SlackClient
 from flask import Flask, request, jsonify
-from google.cloud import pubsub_v1
-import json, re, io, os
+from google.cloud import pubsub
+from google.cloud.proto.pubsub.v1 import pubsub_pb2
+import json, re, io, os, imp, base64
 import pprint
 import httplib2
 import urllib2
 from inyourface import EffectOrchestrator
 from inyourface.GStorageCacheProvider import CacheProvider
-import inyourface.effect
 import logging
 import urllib
+
+import inyourface.effect
 
 import os
 app = Flask(__name__)
@@ -21,7 +23,6 @@ app = Flask(__name__)
 def activate_job():
 
     global project_id, publisher, subscriber, topic_path, subscription_path, bucket_name, slack_api_token
-
     if (os.getenv('APPLICATION_ID')):
         project_id = os.getenv('APPLICATION_ID')
     elif (os.getenv('GCLOUD_PROJECT')):
@@ -36,8 +37,8 @@ def activate_job():
         return False;
 
     # Topics and Subscriptions
-    publisher = pubsub_v1.PublisherClient()
-    subscriber = pubsub_v1.SubscriberClient()
+    publisher = pubsub.PublisherClient()
+    subscriber = pubsub.SubscriberClient()
     topic_path = publisher.topic_path(project_id, 'inyourface')
     subscription_path = subscriber.subscription_path(project_id, 'inyourface')
 
@@ -56,75 +57,54 @@ def activate_job():
         bucket_name = config['BUCKET_NAME']
         slack_api_token = config['SLACK_API_TOKEN']
 
-
     try:
         publisher.create_topic(topic_path)
     except (RetryError) as e:
         # IGNORE: This is not, per the docs, supposed to raise an error
         print "Topic exists"
 
-    # TODO: This is a Real Dumb Idea. This flask app should not also be acting
-    # as a pub/sub worker. This should probably use GAE Task Queues, but again,
-    # the GAE dev env is basically broken with flexible environment.
     try:
-        subscriber.create_subscription(subscription_path, topic_path)
+        push_config = pubsub_pb2.PushConfig(push_endpoint="https://" + project_id + ".appspot.com/slack-generate")
+        subscriber.create_subscription(subscription_path, topic_path, push_config=push_config, ack_deadline_seconds=600)
     except (RetryError) as e:
         # IGNORE: This is not, per the docs, supposed to raise an error.
         print "Subscription exists"
 
-    def protected_worker(message):
-        try:
-            message.ack()
-            if (not message_locked(message)):
-                lock_message(message)
-                sub_worker(message)
-        except Exception as e:
-            logging.exception("Exception on queue worker")
 
-
-    subscriber.subscribe(subscription_path, callback=protected_worker)
-
-
-def sub_worker(message):
+@app.route("/slack-generate", methods = ['POST'])
+def sub_worker():
     global project_id
-    response_url = message.attributes.get('response_url')
-    effects = message.attributes.get('effects').split(' ')
-    urls = message.attributes.get('urls').split(' ')
-    text = message.data
+
+    envelope = json.loads(request.data.decode('utf-8'))
+    attributes = envelope['message']['attributes']
+
+    response_url = attributes['response_url']
+    effects = attributes['effects'].split(' ')
+    urls = attributes['urls'].split(' ')
 
     gif = EffectOrchestrator(urls, False, False, effects)
     gif.set_cache_provider(CacheProvider(project_id))
     file_path = gif.gif()
+    print file_path
+    print re.match(r".*\.([^.]+\.gif|jpg)", file_path).group(1)
     client = storage.Client()
     bucket = client.get_bucket(bucket_name)
-    blob_match = re.match(r".*\.([^.]+\.gif|jpg)", file_path)
+    blob_match = re.match(r".*\.([^.]+\.)(gif|jpg)", file_path)
     if (blob_match):
-        blob = bucket.blob(blob_match.group(1))
+        blob = bucket.blob(blob_match.group(1) + blob_match.group(2))
         blob.upload_from_filename(filename=file_path)
         blob.make_public(client=client)
         os.unlink(file_path)
 
         req = urllib2.Request(response_url)
         req.add_header('Content-Type', 'application/json')
-
+        print blob.public_url
         response = urllib2.urlopen(req, json.dumps({
             "response_type": "in_channel",
             "text": blob.public_url
         }))
 
-def lock_message(message):
-    client = storage.Client()
-    bucket = client.get_bucket(bucket_name)
-    blob = bucket.blob('lock/' + message.message_id)
-    blob.upload_from_string('LOCK')
-
-def message_locked(message):
-    client = storage.Client()
-    bucket = client.get_bucket(bucket_name)
-    blob = bucket.blob('lock/' + message.message_id)
-    return blob.exists()
-
-
+    return ('', 204)
 
 @app.route("/")
 def hello():
@@ -135,6 +115,7 @@ def hello():
 @app.route("/slack-slash", methods = ['GET', 'POST'])
 def slack():
     text = request.form['text']
+    logging.warn("Triggering: %s", text)
     (tokens, effects, urls) = parse_slack_message(text)
     if (len(effects) == 0):
         return "You must specify some effects!"
@@ -155,8 +136,10 @@ def parse_slack_message(text):
     slack_client = SlackClient(slack_api_token)
     for token in tokens:
         if (re.match(r"\+[A-Za-z]+", token)):
-            effect_name = token.replace('+','')
+            print token
+            effect_name = token.replace('+','').strip()
             if (is_effect(effect_name)):
+                print "Got it"
                 effects.append(effect_name)
         elif (re.match(r"https://slack-imgs.com/\?c=1&url=", token)):
             url = token.replace("https://slack-imgs.com/?c=1&url=",'')
