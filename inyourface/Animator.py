@@ -17,6 +17,7 @@ import os
 
 from inyourface.Face import Face
 from google.cloud import vision
+import inyourface.DefaultCacheProvider
 
 class Animator(object):
     
@@ -33,7 +34,7 @@ class Animator(object):
             self.secondary_urls = []
         self.destdir = destdir
         self.cache_dir = cache_dir
-        self.cache_connection = False
+        self.cache_provider = False
         self.raw_frames = []
         self.total_frames = len(self.__class__.frames)
 
@@ -42,42 +43,31 @@ class Animator(object):
         hasher.update(','.join(url))
 
         if (self.cache_dir):
-            if not os.path.exists(self.cache_dir):
-                os.makedirs(self.cache_dir)
-            conn = sqlite3.connect(self.cache_dir + 'faces.db')
-            self.cache_connection = conn
-            c = conn.cursor()
-
-            # Create table
-            c.execute('''CREATE TABLE IF NOT EXISTS faces
-                         (facesum char(32) PRIMARY KEY, face_data text)''')
-            self.cache_connection.commit()
+            self.cache_provider = inyourface.DefaultCacheProvider.CacheProvider(self.cache_dir)
 
         self.hash = hasher.hexdigest()
 
     def manipulate_frame(self, frame_image, faces, index):
         raise NotImplementedError( "Should have implemented this" )
 
+    def set_cache_provider(self, provider):
+        self.cache_provider = provider
+
     def get_faces(self, image_data):
 
         hasher = hashlib.md5()
         hasher.update(image_data)
         cache_key = hasher.hexdigest()
-        if (self.cache_connection):
-            c = self.cache_connection.cursor()
-            c.execute("select * FROM faces WHERE facesum = ?", (cache_key,))
-            res = c.fetchone()
+        if (self.cache_provider):
+            res = self.cache_provider.get(cache_key)
             if (res):
-                return pickle.loads(res[1])
-
+                return pickle.loads(res)
 
         image = self.vision_client.image(content=image_data)
         faces = image.detect_faces()
 
-        if (self.cache_connection):
-            c = self.cache_connection.cursor()
-            c.execute('REPLACE INTO faces (facesum, face_data) VALUES (?,?)', (cache_key, pickle.dumps(faces)))
-            self.cache_connection.commit()
+        if (self.cache_provider):
+            self.cache_provider.set(cache_key, pickle.dumps(faces))
 
         return faces
 
@@ -144,7 +134,10 @@ class Animator(object):
 
     def gif(self):
         try:
-            outname = self.destdir + self.__class__.name + "/" + self.hash + ".gif"
+            if (self.destdir):
+                outname = self.destdir + self.__class__.name + "/" + self.hash + ".gif"
+            else:
+                outname = NamedTemporaryFile(suffix='.{}.gif'.format(self.hash)).name
             self.imdata = urllib.urlopen(self.url).read()
             self.image = Image.open(cStringIO.StringIO(self.imdata))
             self.secondary_imdata = []
@@ -167,7 +160,10 @@ class Animator(object):
                 cmd = "gifsicle --delay=" + str(self.__class__.delay) + " -l0 --colors 255"
 
             if (self.total_frames == 1 and not self.animated_source):
-                outname = self.destdir + self.__class__.name + "/" + self.hash + ".jpg"
+                if (self.destdir):
+                    outname = self.destdir + self.__class__.name + "/" + self.hash + ".jpg"
+                else:
+                    outname = NamedTemporaryFile(suffix='.{}.jpg'.format(self.hash)).name
                 self.raw_frames[-1].save(outname)
                 return outname
             else:
@@ -177,13 +173,13 @@ class Animator(object):
             cmd += " > " + outname
 
             call(cmd, shell=True)
-            if (self.cache_connection):
-                self.cache_connection.close()
+            if (self.cache_provider):
+                self.cache_provider.close()
             return outname
         except Exception as e:
             pprint.pprint(e)
-            if (self.cache_connection):
-                self.cache_connection.close()
+            if (self.cache_provider):
+                self.cache_provider.close()
 
     def check_animated(self, img):
         try:
