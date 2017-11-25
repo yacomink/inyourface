@@ -5,3 +5,5 @@ Pillow==4.1.0
 google-cloud-vision
 google-cloud-storage
 sympy
+pytest
+pytest-cov
