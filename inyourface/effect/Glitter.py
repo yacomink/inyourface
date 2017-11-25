@@ -1,7 +1,7 @@
 import random
 from PIL import Image, ImageDraw
-import math
-import numpy
+import math, numpy
+import inspect, os
 
 from inyourface.Animator import Animator
 
@@ -10,10 +10,13 @@ class EffectAnimator(Animator):
     name = "glitter"
 
     def manipulate_frame(self, frame_image, faces, index):
+        # hack for submodules
+        dir_path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) # script directory
+        dir_path = dir_path.replace("inyourface/effect", "")
         sparkles = [
-            Image.open('overlays/sparkle_1.png'),
-            Image.open('overlays/sparkle_2.png'),
-            Image.open('overlays/sparkle_3.png')
+            Image.open(dir_path + 'overlays/sparkle_1.png'),
+            Image.open(dir_path + 'overlays/sparkle_2.png'),
+            Image.open(dir_path + 'overlays/sparkle_3.png')
         ]
 
         for face in faces:

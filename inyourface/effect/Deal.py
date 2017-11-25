@@ -1,6 +1,7 @@
 import random
 from PIL import Image, ImageDraw
 import math
+import inspect, os
 
 from inyourface.Animator import Animator
 
@@ -10,7 +11,10 @@ class EffectAnimator(Animator):
 
     def manipulate_frame(self, frame_image, faces, index):
         # Instantiates a client
-        glasses = Image.open('overlays/glasses.png')
+
+        dir_path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) # script directory
+        dir_path = dir_path.replace("inyourface/effect", "")
+        glasses = Image.open(dir_path + 'overlays/glasses.png')
 
         for face in faces:
 
