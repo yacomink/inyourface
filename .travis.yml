@@ -6,4 +6,4 @@ python:
 
 script: 
 
-  - ./script/test
+  - py.test

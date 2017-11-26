@@ -7,3 +7,4 @@ google-cloud-storage
 sympy
 pytest
 pytest-cov
+mock
