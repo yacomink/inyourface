@@ -9,7 +9,6 @@ class CacheProviderForTests(object):
         self.should_cache = should_cache
 
     def get(self, key):
-        print "GETTING"
         if (key in self.get_calls):
             self.get_calls[key] = self.get_calls[key] + 1
         else:

@@ -1,4 +1,4 @@
-import sys, urllib, logging, cStringIO, hashlib, pprint, io, os, pickle, inspect
+import sys, urllib, logging, cStringIO, hashlib, pprint, io, os, pickle, inspect, traceback
 from subprocess import call
 from PIL import Image, ImageDraw
 from tempfile import NamedTemporaryFile
@@ -84,7 +84,7 @@ class Animator(object):
             faces = self.__transform_faces(self.get_faces(content))
 
             try:
-                frame_image = self.__manipulate_frame( frame_image, faces, nframes )
+                frame_image = self.manipulate_frame( frame_image, faces, nframes )
             except:
                 logging.exception("Something awful happened!")
 
@@ -105,7 +105,7 @@ class Animator(object):
             faces = self.__transform_faces(self.get_faces(self.imdata))
 
             try:
-                out = self.__manipulate_frame( self.image.copy(), faces, i )
+                out = self.manipulate_frame( self.image.copy(), faces, i )
             except:
                 logging.exception("Something awful happened!")
     
@@ -168,6 +168,7 @@ class Animator(object):
             pprint.pprint(e)
             if (self.cache_provider):
                 self.cache_provider.close()
+            traceback.print_exc()
 
     def check_animated(self, img):
         try:
