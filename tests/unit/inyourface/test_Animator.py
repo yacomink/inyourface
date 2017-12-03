@@ -57,7 +57,8 @@ class TestExample(unittest.TestCase):
 
     def test_gif_on_jpg(self):
         animator = self.get_animator()
-        print animator.gif()
+        gif_path = animator.gif()
+        self.assertTrue(os.path.isfile(gif_path), "Output is a file that exists");
 
     def getPathForTestDataFile(self, path):
         return os.path.dirname(os.path.realpath(__file__)) + "/../../data/" + path
