@@ -106,15 +106,14 @@ class Animator(object):
 
             try:
                 out = self.manipulate_frame( self.image.copy(), faces, i )
+                self.raw_frames.append(out)
+
+                frames.append(NamedTemporaryFile(suffix='.gif'))
+                durations.append(self.__class__.delay)
+                out.save(frames[-1])
             except:
                 logging.exception("Something awful happened!")
     
-            self.raw_frames.append(out)
-
-            frames.append(NamedTemporaryFile(suffix='.gif'))
-            durations.append(self.__class__.delay)
-            out.save(frames[-1])
-
         return (frames, durations)
 
     def __transform_faces(self, faces):
@@ -142,10 +141,10 @@ class Animator(object):
             if (self.animated_source):
                 self.total_frames = self.animated_source
                 (frames, durations) = self.__generate_frames_from_animation()
-                cmd = "gifsicle -l0 --colors 255"
+                cmd = "gifsicle --no-warnings -l0 --colors 255"
             else:
                 (frames, durations) = self.__generate_frames_from_image()
-                cmd = "gifsicle --delay=" + str(self.__class__.delay) + " -l0 --colors 255"
+                cmd = "gifsicle --no-warnings --delay=" + str(self.__class__.delay) + " -l0 --colors 255"
 
             if (self.total_frames == 1 and not self.animated_source):
                 if (self.destdir):

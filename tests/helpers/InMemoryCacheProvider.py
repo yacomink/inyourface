@@ -6,6 +6,9 @@ class CacheProviderForTests(object):
     set_calls = {}
 
     def __init__(self, should_cache=False):
+        self.get_calls = {}
+        self.set_calls = {}
+        self.cache = {}
         self.should_cache = should_cache
 
     def get(self, key):

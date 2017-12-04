@@ -1,13 +1,15 @@
 from tests import *
 import inyourface
-import hashlib, pickle, mock, urllib, os, json, pprint, re
+import hashlib, pickle, mock, urllib, os, json, pprint, re, pkgutil, inspect
+from inyourface.effect import *
 from inyourface import Animator
 from google.cloud import vision
 from google.cloud.vision.annotations import Annotations
 from tests.helpers import *
 import tests.helpers.InMemoryCacheProvider
+import tests.helpers.AnimatorHelper
 
-class TestExample(unittest.TestCase):
+class TestAnimator(unittest.TestCase):
 
     @mock.patch.object(vision, 'Client')
     @mock.patch.object(inyourface.DefaultCacheProvider, 'CacheProvider')
@@ -27,7 +29,7 @@ class TestExample(unittest.TestCase):
         self.assertEqual(["url"], animator.secondary_urls)
 
     def test_set_cache_provider(self):
-        animator = self.get_animator()
+        animator = tests.helpers.AnimatorHelper.get_animator()
         animator.set_cache_provider("Cats")
         self.assertEqual("Cats", animator.cache_provider)
 
@@ -39,7 +41,7 @@ class TestExample(unittest.TestCase):
         hasher.update(image_data)
         cache_key = hasher.hexdigest()
 
-        animator = self.get_animator('sample_image_with_faces.jpg', True)
+        animator = tests.helpers.AnimatorHelper.get_animator('sample_image_with_faces.jpg', True)
         mock_image  = animator.vision_client.image.return_value
         mock_image.detect_faces.return_value = face_data
         animator.get_faces(image_data)
@@ -56,28 +58,16 @@ class TestExample(unittest.TestCase):
 
 
     def test_gif_on_jpg(self):
-        animator = self.get_animator()
+        animator = tests.helpers.AnimatorHelper.get_animator()
         gif_path = animator.gif()
-        self.assertTrue(os.path.isfile(gif_path), "Output is a file that exists");
+        self.assertTrue(re.search('\.gif$', gif_path), "gif-looking file")
+        self.assertTrue(os.path.isfile(gif_path), "Output is a file that exists")
 
-    def getPathForTestDataFile(self, path):
-        return os.path.dirname(os.path.realpath(__file__)) + "/../../data/" + path
+    def test_gif_on_gif(self):
+        animator = tests.helpers.AnimatorHelper.get_animator("sample_gif_with_faces.gif")
+        gif_path = animator.gif()
+        
+        self.assertEqual(animator.total_frames, len(animator.cache_provider.get_calls), "Got face data for three frames in gif")
+        self.assertTrue(re.search('\.gif$', gif_path), "gif-looking file")
+        self.assertTrue(os.path.isfile(gif_path), "Output is a file that exists")
 
-    def get_sample_data(self, image):
-        file_path = self.getPathForTestDataFile( re.sub('(jpg|gif)', 'json', image ) )
-        with open(file_path, 'r') as f:
-            data = json.loads(f.read())
-            return Annotations.from_api_repr(data.get('responses')[0]).faces
-
-    def get_animator(self, image='sample_image_with_faces.jpg', cache=False):
-        with mock.patch.object(vision, 'Client') as vision_client:
-            cacher = tests.helpers.InMemoryCacheProvider.CacheProviderForTests(cache)
-            animator = MinimalAnimator([self.getPathForTestDataFile( image )], None, None)
-            animator.set_cache_provider(cacher)
-            mock_image  = animator.vision_client.image.return_value
-            mock_image.detect_faces.return_value = self.get_sample_data(image)
-            return animator
-
-class MinimalAnimator(Animator):
-    def manipulate_frame(self, frame_image, faces, index):
-        return frame_image
