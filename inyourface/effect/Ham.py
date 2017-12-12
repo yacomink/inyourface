@@ -5,7 +5,7 @@ from tempfile import NamedTemporaryFile
 import math
 import numpy as np
 from pprint import pprint
-import os 
+import inspect, os
 
 from inyourface.Animator import Animator
 
@@ -15,8 +15,10 @@ class EffectAnimator(Animator):
 
     name = "ham"
 
-    mask_elements_path = os.path.dirname(os.path.realpath(__file__)) + "/../../overlays/ham.png"
-    mask_mouth_path = os.path.dirname(os.path.realpath(__file__)) + "/../../overlays/juggalo-mouth.png"
+    dir_path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()) + "/../.."))
+
+    mask_elements_path = dir_path + "/overlays/ham.png"
+    mask_mouth_path    = dir_path + "/overlays/juggalo-mouth.png"
 
     average_points = np.array([[245, 215],
            [301, 212],

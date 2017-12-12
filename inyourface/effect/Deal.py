@@ -12,9 +12,7 @@ class EffectAnimator(Animator):
     def manipulate_frame(self, frame_image, faces, index):
         # Instantiates a client
 
-        dir_path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) # script directory
-        dir_path = dir_path.replace("inyourface/effect", "")
-        glasses = Image.open(dir_path + 'overlays/glasses.png')
+        glasses = Image.open(self.get_os_dir('overlays/glasses.png'))
 
         for face in faces:
 

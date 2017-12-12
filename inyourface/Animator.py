@@ -13,7 +13,7 @@ import sqlite3
 import pickle
 
 import io
-import os
+import inspect, os
 
 from inyourface.Face import Face
 from google.cloud import vision
@@ -197,3 +197,6 @@ class Animator(object):
         return frames
 
 
+    def get_os_dir(self, directory=""):
+        dir_path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()) + "/.."))
+        return dir_path + "/" + directory

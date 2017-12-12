@@ -10,7 +10,7 @@ class EffectAnimator(Animator):
 
     def cry_frame(self, frame_image, faces, index):
         # Instantiates a client
-        tear = Image.open('overlays/tear.png')
+        tear = Image.open(self.get_os_dir('overlays/tear.png'))
 
         lowest = 0
 
