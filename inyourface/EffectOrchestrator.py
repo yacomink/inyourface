@@ -48,6 +48,10 @@ class EffectOrchestrator(Animator):
 
         self.hash = hasher.hexdigest()
 
+    def set_cache_provider(self, provider):
+        self.cache_provider = provider
+        for effect_processor in self.effect_processors:
+            effect_processor.set_cache_provider(provider)
 
     def manipulate_frame(self, frame_image, faces, index):
         for effect_processor in self.effect_processors:
