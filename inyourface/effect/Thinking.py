@@ -22,7 +22,7 @@ class EffectAnimator(Animator):
 
     def manipulate_frame(self, frame_image, faces, index):
         # Instantiates a client
-        hand = Image.open(self.get_os_dir('overlays/thinking-hand.png'))
+        hand = Image.open(self.__class__.get_os_path('overlays/thinking-hand.png'))
 
         for face in faces:
 

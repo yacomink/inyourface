@@ -10,7 +10,7 @@ class EffectAnimator(Animator):
 
     def manipulate_frame(self, frame_image, faces, index):
         # Instantiates a client
-        googly_eye = Image.open(self.get_os_dir('overlays/eye.png'))
+        googly_eye = Image.open(self.__class__.get_os_path('overlays/eye.png'))
 
         for face in faces:
 

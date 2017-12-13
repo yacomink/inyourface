@@ -11,9 +11,9 @@ class EffectAnimator(Animator):
 
     def manipulate_frame(self, frame_image, faces, index):
         sparkles = [
-            Image.open(self.get_os_dir('overlays/sparkle_1.png')),
-            Image.open(self.get_os_dir('overlays/sparkle_2.png')),
-            Image.open(self.get_os_dir('overlays/sparkle_3.png'))
+            Image.open(self.__class__.get_os_path('overlays/sparkle_1.png')),
+            Image.open(self.__class__.get_os_path('overlays/sparkle_2.png')),
+            Image.open(self.__class__.get_os_path('overlays/sparkle_3.png'))
         ]
 
         for face in faces:

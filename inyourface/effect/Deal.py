@@ -12,7 +12,7 @@ class EffectAnimator(Animator):
     def manipulate_frame(self, frame_image, faces, index):
         # Instantiates a client
 
-        glasses = Image.open(self.get_os_dir('overlays/glasses.png'))
+        glasses = Image.open(self.__class__.get_os_path('overlays/glasses.png'))
 
         for face in faces:
 

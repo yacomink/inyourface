@@ -196,7 +196,7 @@ class Animator(object):
         img.seek(0)
         return frames
 
-
-    def get_os_dir(self, directory=""):
+    @staticmethod
+    def get_os_path(directory=""):
         dir_path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()) + "/.."))
         return dir_path + "/" + directory

@@ -18,7 +18,7 @@ class EffectAnimator(Animator):
     scale_factor = 1.5
 
     def manipulate_frame(self, frame_image, faces, index):
-        fieri = Image.open(self.get_os_dir('overlays/fieri.png'))
+        fieri = Image.open(self.__class__.get_os_path('overlays/fieri.png'))
 
         original_size = frame_image.size
         if (index == 0):
@@ -50,5 +50,3 @@ class EffectAnimator(Animator):
             frame_image.paste(fieri, ( int(self.ex - re_width/2), int(self.ey - re_height/2) ), fieri)
 
         return Image.blend(base, frame_image, float(index+1) / float(self.total_frames))
-
-
