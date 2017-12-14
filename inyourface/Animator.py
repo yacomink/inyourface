@@ -1,19 +1,7 @@
-import sys
-import urllib
-import logging
-import cStringIO
-import hashlib, pprint
-import os
+import sys, urllib, logging, cStringIO, hashlib, pprint, io, os, pickle, inspect, traceback
 from subprocess import call
-import random
 from PIL import Image, ImageDraw
-import math
 from tempfile import NamedTemporaryFile
-import sqlite3
-import pickle
-
-import io
-import inspect, os
 
 from inyourface.Face import Face
 from google.cloud import vision
@@ -72,7 +60,7 @@ class Animator(object):
         return faces
 
 
-    def generate_frames_from_animation(self): 
+    def __generate_frames_from_animation(self): 
         frames = []
         durations = []
         nframes = 0
@@ -93,7 +81,7 @@ class Animator(object):
             with io.open(frames[-1].name, 'rb') as image_file:
                 content = image_file.read()
 
-            faces = self.transform_faces(self.get_faces(content))
+            faces = self.__transform_faces(self.get_faces(content))
 
             try:
                 frame_image = self.manipulate_frame( frame_image, faces, nframes )
@@ -108,28 +96,27 @@ class Animator(object):
 
         return (frames, durations)
 
-    def generate_frames_from_image(self): 
+    def __generate_frames_from_image(self): 
 
         frames = []
         durations = []
         for (i) in range(0, self.total_frames) if self.total_frames > 1 else [0]:
         
-            faces = self.transform_faces(self.get_faces(self.imdata))
+            faces = self.__transform_faces(self.get_faces(self.imdata))
 
             try:
                 out = self.manipulate_frame( self.image.copy(), faces, i )
+                self.raw_frames.append(out)
+
+                frames.append(NamedTemporaryFile(suffix='.gif'))
+                durations.append(self.__class__.delay)
+                out.save(frames[-1])
             except:
                 logging.exception("Something awful happened!")
     
-            self.raw_frames.append(out)
-
-            frames.append(NamedTemporaryFile(suffix='.gif'))
-            durations.append(self.__class__.delay)
-            out.save(frames[-1])
-
         return (frames, durations)
 
-    def transform_faces(self, faces):
+    def __transform_faces(self, faces):
         return map(lambda face: Face.from_google_face(face), faces)
 
     def gif(self):
@@ -153,11 +140,11 @@ class Animator(object):
             durations = [self.__class__.delay]
             if (self.animated_source):
                 self.total_frames = self.animated_source
-                (frames, durations) = self.generate_frames_from_animation()
-                cmd = "gifsicle -l0 --colors 255"
+                (frames, durations) = self.__generate_frames_from_animation()
+                cmd = "gifsicle --no-warnings -l0 --colors 255"
             else:
-                (frames, durations) = self.generate_frames_from_image()
-                cmd = "gifsicle --delay=" + str(self.__class__.delay) + " -l0 --colors 255"
+                (frames, durations) = self.__generate_frames_from_image()
+                cmd = "gifsicle --no-warnings --delay=" + str(self.__class__.delay) + " -l0 --colors 255"
 
             if (self.total_frames == 1 and not self.animated_source):
                 if (self.destdir):
@@ -180,6 +167,7 @@ class Animator(object):
             pprint.pprint(e)
             if (self.cache_provider):
                 self.cache_provider.close()
+            traceback.print_exc()
 
     def check_animated(self, img):
         try:
@@ -198,5 +186,5 @@ class Animator(object):
 
     @staticmethod
     def get_os_path(directory=""):
-        dir_path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()) + "/.."))
+        dir_path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
         return dir_path + "/" + directory
