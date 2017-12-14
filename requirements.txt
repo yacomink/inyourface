@@ -8,4 +8,3 @@ sympy
 pytest
 pytest-cov
 mock
-click
