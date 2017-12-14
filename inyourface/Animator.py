@@ -186,5 +186,5 @@ class Animator(object):
 
     @staticmethod
     def get_os_path(directory=""):
-        dir_path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()) + "/.."))
+        dir_path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
         return dir_path + "/" + directory
