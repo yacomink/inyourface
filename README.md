@@ -5,7 +5,7 @@ A handful of low-rent animations layered atop all the faces in your image. Uses 
 ### Usage
 
 ```
-Usage: run.py [OPTIONS]
+Usage: inyourface [OPTIONS]
 
 Options:
   --url TEXT                 Url of the input image to be manipulated
@@ -44,4 +44,4 @@ Options:
 
 1. `gifsicle` https://www.lcdf.org/gifsicle/
 
-2. An account setup with the Google Vision API, and your credentials file `google-credentials.json` file somewhere that `run.py` can get to it.
+2. An account setup with the Google Vision API, and your credentials file `google-credentials.json` file somewhere that `inyourface` can get to it.
