@@ -24,11 +24,13 @@ Usage
 Effects
 ~~~~~~~
 
-Angry
-^^^^^
+========  ========  ===========
+Angry     Crying    Cryingblood
+|image0|  |image1|  |image2|
+Googly    Thinking  Juggalo
+|image3|  |image4|  |image8|
+========  ========  ===========
 
-|image0| #### Crying |image1| #### Cryingblood |image2| #### Googly
-|image3| #### Thinking |image4| #### Googly |image5|
 
 Effect Combinations
 ~~~~~~~~~~~~~~~~~~~
@@ -65,4 +67,4 @@ Requirements
 .. |image5| image:: https://github.com/yacomink/inyourface/blob/master/examples/0500b8896bee27f4db798a1c1d9a0e1d1d9a0784.gif?raw=true
 .. |image6| image:: https://github.com/yacomink/inyourface/blob/master/examples/2fecff2f9f51066c704fdeb16298873825f29579.gif?raw=true
 .. |image7| image:: https://github.com/yacomink/inyourface/blob/master/examples/c4a82e74e0c35c71414693446d1fe49ce4288585.gif?raw=true
-
+.. |image8| image:: https://snaps.yacomink.com/m/Image_2017-12-14_11-21-10.png
