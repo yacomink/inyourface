@@ -1,3 +1,4 @@
+__all__ = []
 from inyourface.effect.Angry import EffectAnimator
 from inyourface.effect.Thinking import EffectAnimator
 from inyourface.effect.Googly import EffectAnimator

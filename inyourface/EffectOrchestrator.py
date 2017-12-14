@@ -7,8 +7,8 @@ from subprocess import call
 import random
 from PIL import Image, ImageDraw
 import math
-from tempfile import NamedTemporaryFile
 import inyourface.effect
+from tempfile import NamedTemporaryFile
 
 import io
 import os
