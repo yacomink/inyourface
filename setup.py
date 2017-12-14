@@ -12,9 +12,9 @@ REQUIREMENTS = [
 ]
 
 setuptools.setup(name='inyourface',
-                 version=Version('0.0.6').number,
+                 version=Version('0.0.7').number,
                  description='In Your Face',
-                 long_description=open('README.md').read().strip(),
+                 long_description=open('README.rst').read().strip(),
                  author='Andy Yaco-Mink (@yacomink), Samantha Goldstein (@goldsamantha)',
                  author_email='inyourface@yacomink.com',
                  url='https://github.com/yacomink/inyourface',
