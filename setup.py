@@ -3,7 +3,7 @@ from inyourface.version import Version
 
 
 setuptools.setup(name='inyourface',
-                 version=Version('0.0.1').number,
+                 version=Version('0.0.2').number,
                  description='In Your Face',
                  long_description=open('README.md').read().strip(),
                  author='Andy Yaco-Mink (@yacomink), Samantha Goldstein (@goldsamantha)',
