@@ -45,3 +45,5 @@ Options:
 1. `gifsicle` https://www.lcdf.org/gifsicle/
 
 2. An account setup with the Google Vision API, and your credentials file `google-credentials.json` file somewhere that `inyourface` can get to it.
+
+![build status](https://travis-ci.org/yacomink/inyourface.svg?branch=master)
