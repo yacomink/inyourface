@@ -15,9 +15,9 @@ class CacheProvider(object):
 
     def get(self, key):
         c = self.cache_connection.cursor()
-        c.execute("select * FROM faces WHERE facesum = ?", (key,))
+        c.execute("select face_data FROM faces WHERE facesum = ?", (key,))
         res = c.fetchone()
-        return res[1]
+        return res[0] if res else None
 
     def set(self, key, value):
         c = self.cache_connection.cursor()
