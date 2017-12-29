@@ -10,7 +10,7 @@ Usage
 
 ::
 
-    Usage: inyourface [OPTIONS]
+    Usage: ./bin/inyourface [OPTIONS]
 
     Options:
       --url TEXT                 Url of the input image to be manipulated
@@ -53,6 +53,11 @@ Requirements
 2. An account setup with the Google Vision API, and your credentials
    file ``google-credentials.json`` file somewhere that ``inyourface``
    can get to it.
+
+3. You may need to add the library path to the project home directory
+```
+export PYTHONPATH=./ $PATH:/bin/inyourface
+```
 
 .. figure:: https://travis-ci.org/yacomink/inyourface.svg?branch=master
    :alt: build status
