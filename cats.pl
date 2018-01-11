@@ -2,7 +2,6 @@
 
 if ($block_one) {
 
-    # Do one thing.
     # changes
 }
 
