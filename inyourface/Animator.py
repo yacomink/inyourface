@@ -5,6 +5,7 @@ from tempfile import NamedTemporaryFile
 
 from inyourface.Face import Face
 from google.cloud import vision
+from google.cloud.vision import types, enums
 import inyourface.DefaultCacheProvider
 
 class Animator(object):
@@ -14,7 +15,7 @@ class Animator(object):
     delay = 24
 
     def __init__(self, url, destdir, cache_dir):
-        self.vision_client = vision.Client()
+        self.vision_client = vision.ImageAnnotatorClient()
         self.url = url[-1]
         if len(url) > 1:
             self.secondary_urls = list(url[0:-1])
@@ -51,11 +52,12 @@ class Animator(object):
             if (res):
                 return pickle.loads(res)
 
-        image = self.vision_client.image(content=image_data)
-        faces = image.detect_faces()
+        image = types.Image(content=image_data)
+        response = self.vision_client.face_detection(image=image)
+        faces = response.face_annotations
 
         if (self.cache_provider):
-            self.cache_provider.set(cache_key, pickle.dumps(faces))
+            self.cache_provider.set(cache_key, faces.SerializeToString())
 
         return faces
 
@@ -117,7 +119,7 @@ class Animator(object):
         return (frames, durations)
 
     def __transform_faces(self, faces):
-        return map(lambda face: Face.from_google_face(face), faces)
+        return map(lambda face: Face(face), faces)
 
     def gif(self):
         try:

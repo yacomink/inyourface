@@ -1,25 +1,34 @@
-import google.cloud.vision.face
+from google.cloud.vision import types, enums
+import pprint
 
-class Face(google.cloud.vision.face.Face):
-    @classmethod
-    def from_google_face(cls, google_face):
-        face_data = {
-            'angles': google_face._angles,
-            'bounds': google_face._bounds,
-            'detection_confidence': google_face._detection_confidence,
-            'emotions': google_face._emotions,
-            'fd_bounds': google_face._fd_bounds,
-            'headwear_likelihood': google_face._headwear_likelihood,
-            'image_properties': google_face._image_properties,
-            'landmarks': google_face._landmarks,
-            'landmarking_confidence': google_face._landmarking_confidence,
-        }
-        return cls(**face_data)
+class Face(object):
+    
+    face_types = vars(enums.FaceAnnotation.Landmark.Type);
+
+    def __init__(self, google_face):
+        self.fd_bounding_poly = google_face.fd_bounding_poly
+        self.bounding_poly = google_face.bounding_poly
+        self.landmarks = google_face.landmarks
+        self.roll_angle = google_face.roll_angle
+        self.tilt_angle = google_face.tilt_angle
+        self.pan_angle = google_face.pan_angle
+        self.detection_confidence = google_face.detection_confidence
+        self.landmarking_confidence = google_face.landmarking_confidence
+        self.joy_likelihood = google_face.joy_likelihood
+        self.sorrow_likelihood = google_face.sorrow_likelihood
+        self.anger_likelihood = google_face.anger_likelihood
+        self.surprise_likelihood = google_face.surprise_likelihood
+        self.under_exposed_likelihood = google_face.under_exposed_likelihood
+        self.blurred_likelihood = google_face.blurred_likelihood
+        self.headwear_likelihood = google_face.headwear_likelihood
+
+    def get_landmark(self, landmark_name):
+        return self.landmarks[ self.face_types.get(landmark_name.upper()) - 1 ]
 
     def get_landmark_coords(self, landmark_name):
 
-        return (getattr(self.landmarks, landmark_name).position.x_coordinate,
-                getattr(self.landmarks, landmark_name).position.y_coordinate)
+        return (self.get_landmark(landmark_name).position.x,
+                self.get_landmark(landmark_name).position.y)
 
     def get_eye_coords(self, side):
         (ex, ey) = self.get_landmark_coords(side + '_eye')

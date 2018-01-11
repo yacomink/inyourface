@@ -80,7 +80,7 @@ class EffectAnimator(Animator):
                         'chin_gnathion',
                         'chin_left_gonion',
                         'chin_right_gonion'):
-            points.append( (int(getattr(face.landmarks, feature).position.x_coordinate), int(getattr(face.landmarks, feature).position.y_coordinate)))
+            points.append( (int(getattr(face.landmarks, feature).position.x), int(getattr(face.landmarks, feature).position.y)))
         return points
 
     # Apply affine transform calculated using srcTri and dstTri to src and

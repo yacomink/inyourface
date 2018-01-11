@@ -38,7 +38,7 @@ class EffectAnimator(Animator):
             if (height > end):
                 height = end
 
-            pasted = hand.resize((ew, ew), Image.BICUBIC).rotate(face.angles.tilt, Image.BICUBIC)
+            pasted = hand.resize((ew, ew), Image.BICUBIC).rotate(face.tilt_angle, Image.BICUBIC)
             frame_image.paste(pasted, (int(ex), int(height)), pasted)
 
         return frame_image

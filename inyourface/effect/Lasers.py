@@ -24,11 +24,11 @@ class EffectAnimator(Animator):
                 ew = int(0.25 * math.hypot(rcx - lcx, rcy - lcy))
 
                 (x1, y1) = face.get_landmark_coords(side + '_eye')
-                pan_angle = face.angles.pan + 180
-                tilt_angle = face.angles.tilt + 180
-                if (abs(face.angles.pan) < 10):
+                pan_angle = face.pan_angle + 180
+                tilt_angle = face.tilt_angle + 180
+                if (abs(face.pan_angle) < 10):
                     pan_angle = 180
-                    if (face.angles.pan > -1):
+                    if (face.pan_angle > -1):
                         tilt_angle = 270
                     else:
                         tilt_angle = 90
@@ -37,12 +37,12 @@ class EffectAnimator(Animator):
                 pan_angle = pan_angle * progress
 
                 laser_length = Point(0,0).distance(Point(frame_image.width, frame_image.height))
-                if (face.angles.pan < 0):
+                if (face.pan_angle < 0):
                     x2 = x1 + (laser_length * math.cos(math.radians( pan_angle )))
                 else:
                     x2 = x1 - (laser_length * math.cos(math.radians( pan_angle )))
 
-                if (tilt_angle > 180 or abs(face.angles.pan) < 10):
+                if (tilt_angle > 180 or abs(face.pan_angle) < 10):
                     y2 = y1 + (laser_length * math.sin(math.radians( tilt_angle )))
                 else:
                     y2 = y1 - (laser_length * math.sin(math.radians( tilt_angle )))
@@ -53,7 +53,7 @@ class EffectAnimator(Animator):
                 draw.line( [(x1, y1),(x2, y2)],fill='red', width=ew )
 
                 # (ex, ey) = face.get_landmark_coords('nose_tip')
-                # draw.text((ex, ey),"{}, {}, {}".format(face.angles.pan, face.angles.tilt, face.angles.roll),(255,255,255),font=font)
+                # draw.text((ex, ey),"{}, {}, {}".format(face.pan_angle, face.tilt_angle, face.roll_angle),(255,255,255),font=font)
 
 
         return frame_image
