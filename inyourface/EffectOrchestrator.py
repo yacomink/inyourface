@@ -35,7 +35,7 @@ class EffectOrchestrator(Animator):
                 self.effect_processors.append(effect_processor)
 
             except Exception as ex:
-                print "No such " + e
+                print("No such " + e)
 
         if max_frames > 1:
             self.frames = range(0, max_frames)

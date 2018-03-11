@@ -44,23 +44,29 @@ class Animator(object):
 
     def get_faces(self, image_data):
 
-        hasher = hashlib.md5()
-        hasher.update(image_data)
-        cache_key = hasher.hexdigest()
+        cache_key = self.get_cache_key_for_image(image_data)
         if (self.cache_provider):
             res = self.cache_provider.get(cache_key)
             if (res):
-                return pickle.loads(res)
+                print(res)
+                cached_faces = types.AnnotateImageResponse()
+                cached_faces.ParseFromString(res)
+                return cached_faces.face_annotations
 
         image = types.Image(content=image_data)
         response = self.vision_client.face_detection(image=image)
         faces = response.face_annotations
 
         if (self.cache_provider):
-            self.cache_provider.set(cache_key, faces.SerializeToString())
+            self.cache_provider.set(cache_key, response.SerializeToString())
 
         return faces
 
+    def get_cache_key_for_image(self, image_data):
+        hasher = hashlib.md5()
+        hasher.update(image_data)
+        hasher.update('protobuf')
+        return hasher.hexdigest()
 
     def __generate_frames_from_animation(self): 
         frames = []
