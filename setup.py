@@ -2,17 +2,18 @@ import setuptools
 from inyourface.version import Version
 
 REQUIREMENTS = [
-    "click==6.7",
-    "opencv_python==3.2.0.6",
-    "numpy==1.12.0",
-    "Pillow==4.1.0",
-    "google-cloud-vision==0.28.0",
-    "google-cloud-storage==1.6.0",
-    "sympy"
+    "click",
+    "opencv_python==4.2.0.32",
+    "Pillow==6.2.0",
+    "numpy>=1.12.0",
+    "google-cloud-vision>=0.30.0",
+    "google-cloud-storage>=1.8.0",
+    "sympy",
+    "six"
 ]
 
 setuptools.setup(name='inyourface',
-                 version=Version('0.0.13').number,
+                 version=Version('0.0.14').number,
                  description='In Your Face',
                  long_description=open('README.rst').read().strip(),
                  author='Andy Yaco-Mink (@yacomink), Samantha Goldstein (@goldsamantha)',
