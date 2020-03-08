@@ -8,3 +8,4 @@ sympy
 pytest
 pytest-cov
 mock
+six

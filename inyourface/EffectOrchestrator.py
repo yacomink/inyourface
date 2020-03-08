@@ -1,5 +1,5 @@
 import sys
-import urllib.parse, urllib.error
+from six.moves import urllib
 import io
 import hashlib, pprint
 import os
