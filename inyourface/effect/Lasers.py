@@ -8,7 +8,7 @@ from inyourface.Animator import Animator
 class EffectAnimator(Animator):
 
     name = "lasers"
-    frames = range(0,10)
+    frames = list(range(0,10))
 
     def manipulate_frame(self, frame_image, faces, index):
 

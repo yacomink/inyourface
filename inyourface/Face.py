@@ -36,4 +36,4 @@ class Face(object):
         return ((lcx, lcy), (ex, ey), (rcx, rcy))
 
     def get_paired_landmark_coords(self, landmark_name):
-        return map(lambda side: self.get_landmark_coords( landmark_name % side ), ['left', 'right'])
+        return [self.get_landmark_coords( landmark_name % side ) for side in ['left', 'right']]

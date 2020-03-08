@@ -1,4 +1,4 @@
-from inyourface.version import Version
+from .inyourface.version import Version
 from tests import *
 from tests.helpers import *
 

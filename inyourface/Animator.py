@@ -1,4 +1,4 @@
-import sys, urllib, logging, cStringIO, hashlib, pprint, io, os, pickle, inspect, traceback
+import sys, urllib.request, urllib.parse, urllib.error, logging, io, hashlib, pprint, io, os, pickle, inspect, traceback
 from subprocess import call
 from PIL import Image, ImageDraw
 from tempfile import NamedTemporaryFile
@@ -10,7 +10,7 @@ import inyourface.DefaultCacheProvider
 
 class Animator(object):
     
-    frames = range(0,9)
+    frames = list(range(0,9))
     name = "base"
     delay = 24
 
@@ -108,7 +108,7 @@ class Animator(object):
 
         frames = []
         durations = []
-        for (i) in range(0, self.total_frames) if self.total_frames > 1 else [0]:
+        for (i) in list(range(0, self.total_frames)) if self.total_frames > 1 else [0]:
         
             faces = self.__transform_faces(self.get_faces(self.imdata))
 
@@ -125,7 +125,7 @@ class Animator(object):
         return (frames, durations)
 
     def __transform_faces(self, faces):
-        return map(lambda face: Face(face), faces)
+        return [Face(face) for face in faces]
 
     def gif(self):
         try:
@@ -133,15 +133,15 @@ class Animator(object):
                 outname = self.destdir + self.__class__.name + "/" + self.hash + ".gif"
             else:
                 outname = NamedTemporaryFile(suffix='.{}.gif'.format(self.hash)).name
-            self.imdata = urllib.urlopen(self.url).read()
-            self.image = Image.open(cStringIO.StringIO(self.imdata))
+            self.imdata = urllib.request.urlopen(self.url).read()
+            self.image = Image.open(io.StringIO(self.imdata))
             self.secondary_imdata = []
             self.secondary_image = []
             if (len(self.secondary_urls) > 0):
                 for url in self.secondary_urls:
-                    imdata = urllib.urlopen(url).read();
+                    imdata = urllib.request.urlopen(url).read();
                     self.secondary_imdata.append(imdata)
-                    self.secondary_image.append(Image.open(cStringIO.StringIO(imdata)))
+                    self.secondary_image.append(Image.open(io.StringIO(imdata)))
 
             self.animated_source = self.check_animated(self.image)
 
@@ -162,7 +162,7 @@ class Animator(object):
                 self.raw_frames[-1].save(outname)
                 return outname
             else:
-                for x in xrange(0,self.total_frames):
+                for x in range(0,self.total_frames):
                     cmd += ' -d' + str(durations[x]) + ' ' + frames[x].name
 
             cmd += " > " + outname

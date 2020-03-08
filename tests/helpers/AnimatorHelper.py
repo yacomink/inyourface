@@ -1,6 +1,6 @@
 from tests import *
 import inyourface
-import hashlib, pickle, mock, urllib, os, json, pprint, re, pkgutil, inspect
+import hashlib, pickle, mock, urllib.request, urllib.parse, urllib.error, os, json, pprint, re, pkgutil, inspect
 from inyourface.effect import *
 from inyourface import Animator
 from google.cloud import vision
@@ -10,7 +10,7 @@ from tests.helpers import *
 import tests.helpers.InMemoryCacheProvider
 
 class MinimalAnimator(Animator):
-    frames = range(0,2)
+    frames = list(range(0,2))
     def manipulate_frame(self, frame_image, faces, index):
         return frame_image
 
