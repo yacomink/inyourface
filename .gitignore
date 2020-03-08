@@ -92,3 +92,4 @@ ENV/
 sftp-config.json
 google-credentials.json
 data/*
+.vscode
