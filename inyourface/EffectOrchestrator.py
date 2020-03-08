@@ -42,9 +42,9 @@ class EffectOrchestrator(Animator):
         self.total_frames = max_frames
 
         hasher = hashlib.sha1()
-        hasher.update(self.__class__.name)
-        hasher.update(":".join(effects))
-        hasher.update(','.join(url))
+        hasher.update(self.__class__.name.encode('utf-8'))
+        hasher.update(":".join(effects).encode('utf-8'))
+        hasher.update(','.join(url).encode('utf-8'))
 
         self.hash = hasher.hexdigest()
 

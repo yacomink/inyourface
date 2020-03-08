@@ -28,8 +28,8 @@ class Animator(object):
         self.total_frames = len(self.__class__.frames)
 
         hasher = hashlib.sha1()
-        hasher.update(self.__class__.name)
-        hasher.update(','.join(url))
+        hasher.update(self.__class__.name.encode('utf-8'))
+        hasher.update(','.join(url).encode('utf-8'))
 
         if (self.cache_dir):
             self.cache_provider = inyourface.DefaultCacheProvider.CacheProvider(self.cache_dir)
@@ -65,7 +65,7 @@ class Animator(object):
     def get_cache_key_for_image(self, image_data):
         hasher = hashlib.md5()
         hasher.update(image_data)
-        hasher.update('protobuf')
+        hasher.update('protobuf'.encode('utf-8'))
         return hasher.hexdigest()
 
     def __generate_frames_from_animation(self): 
@@ -130,11 +130,11 @@ class Animator(object):
     def gif(self):
         try:
             if (self.destdir):
-                outname = self.destdir + self.__class__.name + "/" + self.hash + ".gif"
+                outname = self.destdir + self.hash + ".gif"
             else:
                 outname = NamedTemporaryFile(suffix='.{}.gif'.format(self.hash)).name
             self.imdata = urllib.request.urlopen(self.url).read()
-            self.image = Image.open(io.StringIO(self.imdata))
+            self.image = Image.open(io.BytesIO(self.imdata))
             self.secondary_imdata = []
             self.secondary_image = []
             if (len(self.secondary_urls) > 0):
@@ -156,7 +156,7 @@ class Animator(object):
 
             if (self.total_frames == 1 and not self.animated_source):
                 if (self.destdir):
-                    outname = self.destdir + self.__class__.name + "/" + self.hash + ".jpg"
+                    outname = self.destdir + self.hash + ".jpg"
                 else:
                     outname = NamedTemporaryFile(suffix='.{}.jpg'.format(self.hash)).name
                 self.raw_frames[-1].save(outname)

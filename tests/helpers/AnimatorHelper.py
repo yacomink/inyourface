@@ -20,7 +20,7 @@ def getPathForTestDataFile(path):
 
 def get_sample_data(image):
     file_path = getPathForTestDataFile( re.sub('(jpg|gif)$', 'protobuf', image ) )
-    with open(file_path, 'r') as f:
+    with open(file_path, 'rb') as f:
         data = f.read()
         f.close()
         return string_to_face(data)
