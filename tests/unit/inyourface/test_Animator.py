@@ -1,17 +1,17 @@
 from tests import *
 import inyourface
-import hashlib, pickle, mock, urllib, os, json, pprint, re, pkgutil, inspect
+import hashlib, pickle, mock, os, json, pprint, re, pkgutil, inspect
 from inyourface.effect import *
 from inyourface import Animator
 from google.cloud import vision
-from google.cloud.vision.annotations import Annotations
+from google.cloud.vision import types, enums
 from tests.helpers import *
 import tests.helpers.InMemoryCacheProvider
 import tests.helpers.AnimatorHelper
 
 class TestAnimator(unittest.TestCase):
 
-    @mock.patch.object(vision, 'Client')
+    @mock.patch.object(vision, 'ImageAnnotatorClient')
     @mock.patch.object(inyourface.DefaultCacheProvider, 'CacheProvider')
     def test_constructor(self, cache_provider, vision_client):
         animator = Animator(["url"], "/dev/null", None)
@@ -33,28 +33,25 @@ class TestAnimator(unittest.TestCase):
         animator.set_cache_provider("Cats")
         self.assertEqual("Cats", animator.cache_provider)
 
-    def test_get_faces(self):
-        image_data = "image data"
+    @mock.patch.object(types, 'AnnotateImageResponse')
+    def test_get_faces(self, mock_image):
+        image_data = b'image data'
         face_data = "Cats"
 
-        hasher = hashlib.md5()
-        hasher.update(image_data)
-        cache_key = hasher.hexdigest()
-
         animator = tests.helpers.AnimatorHelper.get_animator('sample_image_with_faces.jpg', True)
-        mock_image  = animator.vision_client.image.return_value
-        mock_image.detect_faces.return_value = face_data
+        cache_key = animator.get_cache_key_for_image(image_data)
+        animator.vision_client.face_detection.return_value = mock_image
+        mock_image.face_annotations.return_value = tests.helpers.AnimatorHelper.get_sample_data('sample_image_with_faces.jpg')
         animator.get_faces(image_data)
-        animator.vision_client.image.assert_called_once()
-        mock_image.detect_faces.assert_called_once()
+        animator.vision_client.face_detection.assert_called_once()
 
         self.assertEqual(1, animator.cache_provider.get_calls[cache_key], "Checked cache")
-        self.assertEqual(face_data, pickle.loads(animator.cache_provider.set_calls[cache_key]), "Cached result")
+        self.assertIsNotNone(animator.cache_provider.set_calls[cache_key], "Cached result")
 
         animator.get_faces(image_data)
         self.assertEqual(2, animator.cache_provider.get_calls[cache_key], "Checked cache")
         # No additional call to image api on cache hit
-        animator.vision_client.image.assert_called_once()
+        animator.vision_client.face_detection.assert_called_once()
 
 
     def test_gif_on_jpg(self):

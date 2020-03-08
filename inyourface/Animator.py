@@ -1,20 +1,22 @@
-import sys, urllib, logging, cStringIO, hashlib, pprint, io, os, pickle, inspect, traceback
+import sys, logging, io, hashlib, pprint, io, os, pickle, inspect, traceback
+from six.moves import urllib
 from subprocess import call
 from PIL import Image, ImageDraw
 from tempfile import NamedTemporaryFile
 
 from inyourface.Face import Face
 from google.cloud import vision
+from google.cloud.vision import types, enums
 import inyourface.DefaultCacheProvider
 
 class Animator(object):
     
-    frames = range(0,9)
+    frames = list(range(0,9))
     name = "base"
     delay = 24
 
     def __init__(self, url, destdir, cache_dir):
-        self.vision_client = vision.Client()
+        self.vision_client = vision.ImageAnnotatorClient()
         self.url = url[-1]
         if len(url) > 1:
             self.secondary_urls = list(url[0:-1])
@@ -27,8 +29,8 @@ class Animator(object):
         self.total_frames = len(self.__class__.frames)
 
         hasher = hashlib.sha1()
-        hasher.update(self.__class__.name)
-        hasher.update(','.join(url))
+        hasher.update(self.__class__.name.encode('utf-8'))
+        hasher.update(','.join(url).encode('utf-8'))
 
         if (self.cache_dir):
             self.cache_provider = inyourface.DefaultCacheProvider.CacheProvider(self.cache_dir)
@@ -43,22 +45,29 @@ class Animator(object):
 
     def get_faces(self, image_data):
 
-        hasher = hashlib.md5()
-        hasher.update(image_data)
-        cache_key = hasher.hexdigest()
+        cache_key = self.get_cache_key_for_image(image_data)
         if (self.cache_provider):
             res = self.cache_provider.get(cache_key)
             if (res):
-                return pickle.loads(res)
+                print(res)
+                cached_faces = types.AnnotateImageResponse()
+                cached_faces.ParseFromString(res)
+                return cached_faces.face_annotations
 
-        image = self.vision_client.image(content=image_data)
-        faces = image.detect_faces()
+        image = types.Image(content=image_data)
+        response = self.vision_client.face_detection(image=image)
+        faces = response.face_annotations
 
         if (self.cache_provider):
-            self.cache_provider.set(cache_key, pickle.dumps(faces))
+            self.cache_provider.set(cache_key, response.SerializeToString())
 
         return faces
 
+    def get_cache_key_for_image(self, image_data):
+        hasher = hashlib.md5()
+        hasher.update(image_data)
+        hasher.update('protobuf'.encode('utf-8'))
+        return hasher.hexdigest()
 
     def __generate_frames_from_animation(self): 
         frames = []
@@ -100,7 +109,7 @@ class Animator(object):
 
         frames = []
         durations = []
-        for (i) in range(0, self.total_frames) if self.total_frames > 1 else [0]:
+        for (i) in list(range(0, self.total_frames)) if self.total_frames > 1 else [0]:
         
             faces = self.__transform_faces(self.get_faces(self.imdata))
 
@@ -117,23 +126,23 @@ class Animator(object):
         return (frames, durations)
 
     def __transform_faces(self, faces):
-        return map(lambda face: Face.from_google_face(face), faces)
+        return [Face(face) for face in faces]
 
     def gif(self):
         try:
             if (self.destdir):
-                outname = self.destdir + self.__class__.name + "/" + self.hash + ".gif"
+                outname = self.destdir + self.hash + ".gif"
             else:
                 outname = NamedTemporaryFile(suffix='.{}.gif'.format(self.hash)).name
-            self.imdata = urllib.urlopen(self.url).read()
-            self.image = Image.open(cStringIO.StringIO(self.imdata))
+            self.imdata = urllib.request.urlopen(self.url).read()
+            self.image = Image.open(io.BytesIO(self.imdata))
             self.secondary_imdata = []
             self.secondary_image = []
             if (len(self.secondary_urls) > 0):
                 for url in self.secondary_urls:
-                    imdata = urllib.urlopen(url).read();
+                    imdata = urllib.request.urlopen(url).read();
                     self.secondary_imdata.append(imdata)
-                    self.secondary_image.append(Image.open(cStringIO.StringIO(imdata)))
+                    self.secondary_image.append(Image.open(io.StringIO(imdata)))
 
             self.animated_source = self.check_animated(self.image)
 
@@ -148,13 +157,13 @@ class Animator(object):
 
             if (self.total_frames == 1 and not self.animated_source):
                 if (self.destdir):
-                    outname = self.destdir + self.__class__.name + "/" + self.hash + ".jpg"
+                    outname = self.destdir + self.hash + ".jpg"
                 else:
                     outname = NamedTemporaryFile(suffix='.{}.jpg'.format(self.hash)).name
                 self.raw_frames[-1].save(outname)
                 return outname
             else:
-                for x in xrange(0,self.total_frames):
+                for x in range(0,self.total_frames):
                     cmd += ' -d' + str(durations[x]) + ' ' + frames[x].name
 
             cmd += " > " + outname

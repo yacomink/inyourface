@@ -1,4 +1,5 @@
 [report]
 exclude_lines = 
     def __[^(]*[^_][(]
-
+omit = 
+    script/*

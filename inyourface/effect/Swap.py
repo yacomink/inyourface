@@ -80,7 +80,7 @@ class EffectAnimator(Animator):
                         'chin_gnathion',
                         'chin_left_gonion',
                         'chin_right_gonion'):
-            points.append( (int(getattr(face.landmarks, feature).position.x_coordinate), int(getattr(face.landmarks, feature).position.y_coordinate)))
+            points.append( (int(getattr(face.landmarks, feature).position.x), int(getattr(face.landmarks, feature).position.y)))
         return points
 
     # Apply affine transform calculated using srcTri and dstTri to src and
@@ -138,8 +138,8 @@ class EffectAnimator(Animator):
             if self.rectContains(rect, pt1) and self.rectContains(rect, pt2) and self.rectContains(rect, pt3):
                 count = count + 1 
                 ind = []
-                for j in xrange(0, 3):
-                    for k in xrange(0, len(points)):                    
+                for j in range(0, 3):
+                    for k in range(0, len(points)):                    
                         if(abs(pt[j][0] - points[k][0]) < 1.0 and abs(pt[j][1] - points[k][1]) < 1.0):
                             ind.append(k)                            
                 if len(ind) == 3:                                                
@@ -163,7 +163,7 @@ class EffectAnimator(Animator):
         t2Rect = []
         t2RectInt = []
 
-        for i in xrange(0, 3):
+        for i in range(0, 3):
             t1Rect.append(((t1[i][0] - r1[0]),(t1[i][1] - r1[1])))
             t2Rect.append(((t2[i][0] - r2[0]),(t2[i][1] - r2[1])))
             t2RectInt.append(((t2[i][0] - r2[0]),(t2[i][1] - r2[1])))
@@ -198,7 +198,7 @@ class EffectAnimator(Animator):
         hull2 = []
 
         hullIndex = cv2.convexHull(np.array(points2), returnPoints = False)
-        for i in xrange(0, len(hullIndex)):
+        for i in range(0, len(hullIndex)):
             hull1.append(points1[hullIndex[i][0]])
             hull2.append(points2[hullIndex[i][0]])
         
@@ -213,12 +213,12 @@ class EffectAnimator(Animator):
             quit()
         
         # Apply affine transformation to Delaunay triangles
-        for i in xrange(0, len(dt)):
+        for i in range(0, len(dt)):
             t1 = []
             t2 = []
             
             #get points for img1, img2 corresponding to the triangles
-            for j in xrange(0, 3):
+            for j in range(0, 3):
                 t1.append(hull1[dt[i][j]])
                 t2.append(hull2[dt[i][j]])
             
@@ -227,7 +227,7 @@ class EffectAnimator(Animator):
                 
         # Calculate Mask
         hull8U = []
-        for i in xrange(0, len(hull2)):
+        for i in range(0, len(hull2)):
             hull8U.append((hull2[i][0], hull2[i][1]))
         
         cv2.fillConvexPoly(mask, np.int32(hull8U), (255, 255, 255))

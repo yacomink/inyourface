@@ -1,6 +1,6 @@
 import sys
-import urllib
-import cStringIO
+from six.moves import urllib
+import io
 import hashlib, pprint
 import os
 from subprocess import call
@@ -17,7 +17,7 @@ from inyourface.Animator import Animator
 
 class EffectOrchestrator(Animator):
     
-    frames = range(0,9)
+    frames = list(range(0,9))
     name = "multi"
     delay = 24
 
@@ -35,16 +35,16 @@ class EffectOrchestrator(Animator):
                 self.effect_processors.append(effect_processor)
 
             except Exception as ex:
-                print "No such " + e
+                print(("No such " + e))
 
         if max_frames > 1:
-            self.frames = range(0, max_frames)
+            self.frames = list(range(0, max_frames))
         self.total_frames = max_frames
 
         hasher = hashlib.sha1()
-        hasher.update(self.__class__.name)
-        hasher.update(":".join(effects))
-        hasher.update(','.join(url))
+        hasher.update(self.__class__.name.encode('utf-8'))
+        hasher.update(":".join(effects).encode('utf-8'))
+        hasher.update(','.join(url).encode('utf-8'))
 
         self.hash = hasher.hexdigest()
 

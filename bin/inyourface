@@ -24,15 +24,15 @@ def run(url, effect, google_credentials, image_directory, cache_dir):
     effect = list(filter((lambda x: is_effect(x)), effect))
 
     if (len(effect) == 0):
-        print "You must specify some effects!"
+        print("You must specify some effects!")
         exit()
     elif (len(effect) == 1):
         effect_module = getattr(inyourface.effect, effect[0][0].upper() + effect[0][1:])
         gif = effect_module.EffectAnimator(url, image_directory, cache_dir)
-        print gif.gif()
+        print(gif.gif())
     else:
         gif = EffectOrchestrator(url, image_directory, cache_dir, effect)
-        print gif.gif()
+        print(gif.gif())
 
 def is_effect(e):
     try:

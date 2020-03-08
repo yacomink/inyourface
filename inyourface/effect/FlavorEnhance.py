@@ -9,7 +9,7 @@ from inyourface.Animator import Animator
 class EffectAnimator(Animator):
 
     name = "multi"
-    frames = range(0,6)
+    frames = list(range(0,6))
     delay = 200
     random_face = None
     ex = 0

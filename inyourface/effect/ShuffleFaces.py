@@ -24,7 +24,7 @@ class EffectAnimator(Swap.EffectAnimator):
         random.shuffle(source_faces)
         mask = np.zeros(dest.shape, dtype = dest.dtype)
 
-        for j in xrange(len(faces)):
+        for j in range(len(faces)):
             (dest, mask) = self.pasteOne(source, dest, source_faces[ j ], dest_faces[j], mask)
 
         frame_image.paste(Image.fromarray(dest), mask=Image.fromarray(mask).convert('L').filter(ImageFilter.GaussianBlur(4)))

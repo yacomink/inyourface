@@ -22,7 +22,7 @@ class EffectAnimator(Animator):
 
                 ew = int(1.25 * math.hypot(rcx - lcx, rcy - lcy))
 
-                pasted = tear.resize((ew, ew), Image.BICUBIC).rotate(face.angles.tilt, Image.BICUBIC)
+                pasted = tear.resize((ew, ew), Image.BICUBIC).rotate(face.tilt_angle, Image.BICUBIC)
                 left_y = int(lcy + (index * ew * 1.5) + (ew * .5))
                 right_y = int(rcy + (index * ew * 1.5) + (ew * .75) )
                 frame_image.paste(pasted, (int(lcx - ew/2), left_y), pasted)
