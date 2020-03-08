@@ -35,7 +35,7 @@ class TestAnimator(unittest.TestCase):
 
     @mock.patch.object(types, 'AnnotateImageResponse')
     def test_get_faces(self, mock_image):
-        image_data = "image data"
+        image_data = b'image data'
         face_data = "Cats"
 
         animator = tests.helpers.AnimatorHelper.get_animator('sample_image_with_faces.jpg', True)

@@ -29,7 +29,7 @@ def get_sample_data(image):
 def get_animator(image='sample_image_with_faces.jpg', cache=False, animator_class=MinimalAnimator):
     with mock.patch.object(vision, 'ImageAnnotatorClient') as vision_client:
         cacher = tests.helpers.InMemoryCacheProvider.CacheProviderForTests(cache)
-        animator = animator_class([getPathForTestDataFile( image )], None, None)
+        animator = animator_class(["file://" + getPathForTestDataFile( image )], None, None)
         animator.set_cache_provider(cacher)
         mock_image = animator.vision_client.face_detection.return_value
         mock_image.face_annotations.return_value = get_sample_data(image)
