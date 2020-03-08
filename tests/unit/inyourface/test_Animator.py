@@ -1,6 +1,6 @@
 from tests import *
 import inyourface
-import hashlib, pickle, mock, urllib.request, urllib.parse, urllib.error, os, json, pprint, re, pkgutil, inspect
+import hashlib, pickle, mock, urllib.parse, urllib.error, os, json, pprint, re, pkgutil, inspect
 from inyourface.effect import *
 from inyourface import Animator
 from google.cloud import vision

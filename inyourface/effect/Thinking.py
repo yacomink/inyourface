@@ -1,6 +1,6 @@
 import numpy as np
 import sys
-import urllib.request, urllib.parse, urllib.error
+import urllib.parse, urllib.error
 import io
 import hashlib, pprint
 import tempfile, os

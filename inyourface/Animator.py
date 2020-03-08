@@ -1,4 +1,4 @@
-import sys, urllib.request, urllib.parse, urllib.error, logging, io, hashlib, pprint, io, os, pickle, inspect, traceback
+import sys, urllib.parse, urllib.error, logging, io, hashlib, pprint, io, os, pickle, inspect, traceback
 from subprocess import call
 from PIL import Image, ImageDraw
 from tempfile import NamedTemporaryFile
