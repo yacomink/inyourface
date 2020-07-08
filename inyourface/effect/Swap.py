@@ -48,39 +48,8 @@ class EffectAnimator(Animator):
 
     def getPoints(self, face):
         points = []
-        for feature in ('left_of_left_eyebrow',
-                        'right_of_left_eyebrow',
-                        'left_of_right_eyebrow',
-                        'right_of_right_eyebrow',
-                        'midpoint_between_eyes',
-                        'nose_tip',
-                        'upper_lip',
-                        'lower_lip',
-                        'mouth_left',
-                        'mouth_right',
-                        'mouth_center',
-                        'nose_bottom_right',
-                        'nose_bottom_left',
-                        'nose_bottom_center',
-                        'left_eye_top_boundary',
-                        'left_eye_right_corner',
-                        'left_eye_bottom_boundary',
-                        'left_eye_left_corner',
-                        'right_eye_top_boundary',
-                        'right_eye_right_corner',
-                        'right_eye_bottom_boundary',
-                        'right_eye_left_corner',
-                        'left_eyebrow_upper_midpoint',
-                        'right_eyebrow_upper_midpoint',
-                        'left_ear_tragion',
-                        'right_ear_tragion',
-                        'left_eye_pupil',
-                        'right_eye_pupil',
-                        'forehead_glabella',
-                        'chin_gnathion',
-                        'chin_left_gonion',
-                        'chin_right_gonion'):
-            points.append( (int(getattr(face.landmarks, feature).position.x), int(getattr(face.landmarks, feature).position.y)))
+        for attr, landmark in face.landmarks.__dict__.iteritems():
+            points.append((int(landmark.position.x), int(landmark.position.y)))
         return points
 
     # Apply affine transform calculated using srcTri and dstTri to src and
