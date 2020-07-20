@@ -5,7 +5,6 @@ import io
 import numpy as np
 import cv2
 import pprint
-from protobuf_to_dict import protobuf_to_dict, dict_to_protobuf
 from google.cloud import vision
 
 import random
