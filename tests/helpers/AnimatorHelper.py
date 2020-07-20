@@ -1,7 +1,8 @@
 from tests import *
+import mock
 import inyourface
+import requests
 import hashlib, pickle, mock, os, json, pprint, re, pkgutil, inspect
-from six.moves import urllib
 from inyourface.effect import *
 from inyourface import Animator
 from google.cloud import vision
@@ -25,7 +26,6 @@ def get_sample_data(image):
         data = f.read()
         f.close()
         return string_to_face(data)
-
 
 def get_animator(image='sample_image_with_faces.jpg', cache=False, animator_class=MinimalAnimator):
     with mock.patch.object(vision, 'ImageAnnotatorClient') as vision_client:

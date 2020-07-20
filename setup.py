@@ -1,5 +1,4 @@
 import setuptools
-from inyourface.version import Version
 
 REQUIREMENTS = [
     "click",
@@ -13,7 +12,7 @@ REQUIREMENTS = [
 ]
 
 setuptools.setup(name='inyourface',
-                 version=Version('0.0.14').number,
+                 version='0.0.16',
                  description='In Your Face',
                  long_description=open('README.rst').read().strip(),
                  author='Andy Yaco-Mink (@yacomink), Samantha Goldstein (@goldsamantha)',

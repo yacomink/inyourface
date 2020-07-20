@@ -1,13 +1,25 @@
 from tests import *
 import inyourface
-import inspect, os
+import inspect, os, mock
 from inyourface.effect import *
 from tests.helpers import *
 import tests.helpers.AnimatorHelper
 
 class TestEffects(unittest.TestCase):
 
-    def test_effects(self):
+    def mocked_requests_get(*args, **kwargs):
+        class MockResponse:
+            def __init__(self, content):
+                self.content = content
+
+            def content():
+                return self.content
+
+        f = open("tests/data/sample_gif_with_faces.gif", "rb")
+        return MockResponse(f.read())
+
+    @mock.patch('requests.get', side_effect=mocked_requests_get)
+    def test_effects(self, mockRequest):
             effects = inspect.getmembers(inyourface.effect, inspect.ismodule)
             for effect in effects:
                 if (effect[0] == 'Swap'):
