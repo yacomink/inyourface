@@ -12,7 +12,7 @@ REQUIREMENTS = [
 ]
 
 setuptools.setup(name='inyourface',
-                 version='0.0.15',
+                 version='0.0.16',
                  description='In Your Face',
                  long_description=open('README.rst').read().strip(),
                  author='Andy Yaco-Mink (@yacomink), Samantha Goldstein (@goldsamantha)',
