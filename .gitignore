@@ -93,3 +93,4 @@ sftp-config.json
 google-credentials.json
 data/*
 .vscode
+.pytest_cache

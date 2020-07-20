@@ -1,5 +1,6 @@
 from tests import *
 import inyourface
+import requests
 import hashlib, pickle, mock, os, json, pprint, re, pkgutil, inspect
 from inyourface.effect import *
 from inyourface import Animator
@@ -53,18 +54,29 @@ class TestAnimator(unittest.TestCase):
         # No additional call to image api on cache hit
         animator.vision_client.face_detection.assert_called_once()
 
+    def mocked_requests_get(*args, **kwargs):
+        class MockResponse:
+            def __init__(self, content):
+                self.content = content
 
-    def test_gif_on_jpg(self):
+            def content():
+                return self.content
+
+        f = open("tests/data/sample_gif_with_faces.gif", "rb")
+        return MockResponse(f.read())
+
+    @mock.patch('requests.get', side_effect=mocked_requests_get)
+    def test_gif_on_jpg(self, mockRequests):
         animator = tests.helpers.AnimatorHelper.get_animator()
         gif_path = animator.gif()
         self.assertTrue(re.search('\.gif$', gif_path), "gif-looking file")
         self.assertTrue(os.path.isfile(gif_path), "Output is a file that exists")
 
-    def test_gif_on_gif(self):
+    @mock.patch('requests.get', side_effect=mocked_requests_get)
+    def test_gif_on_gif(self, mockRequests):
         animator = tests.helpers.AnimatorHelper.get_animator("sample_gif_with_faces.gif")
         gif_path = animator.gif()
         
         self.assertEqual(animator.total_frames, len(animator.cache_provider.get_calls), "Got face data for three frames in gif")
         self.assertTrue(re.search('\.gif$', gif_path), "gif-looking file")
         self.assertTrue(os.path.isfile(gif_path), "Output is a file that exists")
-

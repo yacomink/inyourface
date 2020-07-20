@@ -1,5 +1,4 @@
 import sys
-from six.moves import urllib
 import io
 import hashlib, pprint
 import os

@@ -1,5 +1,14 @@
-import sys, logging, io, hashlib, pprint, io, os, pickle, inspect, traceback
-from six.moves import urllib
+import sys
+import logging
+import io
+import hashlib
+import pprint
+import io
+import os
+import pickle
+import inspect
+import traceback
+import requests
 from subprocess import call
 from PIL import Image, ImageDraw
 from tempfile import NamedTemporaryFile
@@ -9,9 +18,10 @@ from google.cloud import vision
 from google.cloud.vision import types, enums
 import inyourface.DefaultCacheProvider
 
+
 class Animator(object):
-    
-    frames = list(range(0,9))
+
+    frames = list(range(0, 9))
     name = "base"
     delay = 24
 
@@ -33,12 +43,13 @@ class Animator(object):
         hasher.update(','.join(url).encode('utf-8'))
 
         if (self.cache_dir):
-            self.cache_provider = inyourface.DefaultCacheProvider.CacheProvider(self.cache_dir)
+            self.cache_provider = inyourface.DefaultCacheProvider.CacheProvider(
+                self.cache_dir)
 
         self.hash = hasher.hexdigest()
 
     def manipulate_frame(self, frame_image, faces, index):
-        raise NotImplementedError( "Should have implemented this" )
+        raise NotImplementedError("Should have implemented this")
 
     def set_cache_provider(self, provider):
         self.cache_provider = provider
@@ -69,20 +80,21 @@ class Animator(object):
         hasher.update('protobuf'.encode('utf-8'))
         return hasher.hexdigest()
 
-    def __generate_frames_from_animation(self): 
+    def __generate_frames_from_animation(self):
         frames = []
         durations = []
         nframes = 0
         while self.image:
             try:
-                self.image.seek( nframes )
+                self.image.seek(nframes)
                 if ('duration' in self.image.info):
-                    durations.append(int(round(self.image.info['duration'] / 10)))
+                    durations.append(
+                        int(round(self.image.info['duration'] / 10)))
                 else:
                     durations.append(self.__class__.delay)
             except EOFError:
                 break;
-        
+
             # extract frame
             frame_image = self.image.convert('RGBA')
             frames.append(NamedTemporaryFile(suffix='.gif'))
@@ -93,7 +105,8 @@ class Animator(object):
             faces = self.__transform_faces(self.get_faces(content))
 
             try:
-                frame_image = self.manipulate_frame( frame_image, faces, nframes )
+                frame_image = self.manipulate_frame(
+                    frame_image, faces, nframes)
             except:
                 logging.exception("Something awful happened!")
 
@@ -105,16 +118,16 @@ class Animator(object):
 
         return (frames, durations)
 
-    def __generate_frames_from_image(self): 
+    def __generate_frames_from_image(self):
 
         frames = []
         durations = []
         for (i) in list(range(0, self.total_frames)) if self.total_frames > 1 else [0]:
-        
+
             faces = self.__transform_faces(self.get_faces(self.imdata))
 
             try:
-                out = self.manipulate_frame( self.image.copy(), faces, i )
+                out = self.manipulate_frame(self.image.copy(), faces, i)
                 self.raw_frames.append(out)
 
                 frames.append(NamedTemporaryFile(suffix='.gif'))
@@ -122,7 +135,7 @@ class Animator(object):
                 out.save(frames[-1])
             except:
                 logging.exception("Something awful happened!")
-    
+
         return (frames, durations)
 
     def __transform_faces(self, faces):
@@ -133,37 +146,41 @@ class Animator(object):
             if (self.destdir):
                 outname = self.destdir + self.hash + ".gif"
             else:
-                outname = NamedTemporaryFile(suffix='.{}.gif'.format(self.hash)).name
-            self.imdata = urllib.request.urlopen(self.url).read()
+                outname = NamedTemporaryFile(
+                    suffix='.{}.gif'.format(self.hash)).name
+
+            response = requests.get(self.url)
+            self.imdata = response.content
             self.image = Image.open(io.BytesIO(self.imdata))
             self.secondary_imdata = []
             self.secondary_image = []
             if (len(self.secondary_urls) > 0):
                 for url in self.secondary_urls:
-                    imdata = urllib.request.urlopen(url).read();
-                    self.secondary_imdata.append(imdata)
-                    self.secondary_image.append(Image.open(io.StringIO(imdata)))
+                    res = requests.get(url)
+                    self.secondary_imdata.append(res.content)
+                    self.secondary_image.append(Image.open(io.BytesIO(res.content)))
 
-            self.animated_source = self.check_animated(self.image)
+            self.animated_source=self.check_animated(self.image)
 
-            durations = [self.__class__.delay]
+            durations=[self.__class__.delay]
             if (self.animated_source):
-                self.total_frames = self.animated_source
-                (frames, durations) = self.__generate_frames_from_animation()
-                cmd = "gifsicle --no-warnings -l0 --colors 255"
+                self.total_frames=self.animated_source
+                (frames, durations)=self.__generate_frames_from_animation()
+                cmd="gifsicle --no-warnings -l0 --colors 255"
             else:
-                (frames, durations) = self.__generate_frames_from_image()
-                cmd = "gifsicle --no-warnings --delay=" + str(self.__class__.delay) + " -l0 --colors 255"
+                (frames, durations)=self.__generate_frames_from_image()
+                cmd="gifsicle --no-warnings --delay=" + str(self.__class__.delay) + " -l0 --colors 255"
 
             if (self.total_frames == 1 and not self.animated_source):
                 if (self.destdir):
-                    outname = self.destdir + self.hash + ".jpg"
+                    outname=self.destdir + self.hash + ".jpg"
                 else:
-                    outname = NamedTemporaryFile(suffix='.{}.jpg'.format(self.hash)).name
+                    outname=NamedTemporaryFile(
+                        suffix='.{}.jpg'.format(self.hash)).name
                 self.raw_frames[-1].save(outname)
                 return outname
             else:
-                for x in range(0,self.total_frames):
+                for x in range(0, self.total_frames):
                     cmd += ' -d' + str(durations[x]) + ' ' + frames[x].name
 
             cmd += " > " + outname
@@ -183,10 +200,10 @@ class Animator(object):
             img.seek(1)
         except (EOFError):
             return 0
-        frames = 0
+        frames=0
         while img:
             try:
-                img.seek( frames )
+                img.seek(frames)
                 frames += 1
             except EOFError:
                 break;
@@ -195,5 +212,6 @@ class Animator(object):
 
     @staticmethod
     def get_os_path(directory=""):
-        dir_path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+        dir_path=os.path.dirname(os.path.abspath(
+            inspect.getfile(inspect.currentframe())))
         return dir_path + "/" + directory
