@@ -3,7 +3,7 @@ import setuptools
 REQUIREMENTS = [
     "click",
     "opencv_python==4.2.0.32",
-    "Pillow==6.2.0",
+    "Pillow==9.0.1",
     "numpy>=1.12.0",
     "google-cloud-vision>=0.30.0",
     "google-cloud-storage>=1.8.0",
